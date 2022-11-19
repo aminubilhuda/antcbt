@@ -39,6 +39,7 @@ if (isset($_FILES['file']['name'])) {
             $foto = $sheetData[$i]['11'];
             $server = $sheetData[$i]['12'];
             $agama = $sheetData[$i]['13'];
+            $no_meja = $sheetData[$i]['14'];
             $qkelas = mysqli_query($koneksi, "SELECT id_kelas FROM kelas WHERE id_kelas='$kelas'");
             $cekkelas = mysqli_num_rows($qkelas);
             if (!$cekkelas <> 0) {
@@ -72,7 +73,7 @@ if (isset($_FILES['file']['name'])) {
                 $exec = mysqli_query($koneksi, "INSERT INTO server (kode_server,nama_server,status)VALUES('$server','$server','aktif')");
             }
             if ($nama <> '') {
-                $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama')");
+                $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama,no_meja) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama','$no_meja')");
                 ($exec) ? $sukses++ : $gagal++;
             }
         }

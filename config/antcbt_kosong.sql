@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Sep 2021 pada 13.21
--- Versi server: 10.4.14-MariaDB
--- Versi PHP: 7.4.10
+-- Generation Time: Nov 19, 2022 at 01:45 AM
+-- Server version: 10.4.22-MariaDB
+-- PHP Version: 7.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `berita`
+-- Table structure for table `berita`
 --
 
 CREATE TABLE `berita` (
@@ -49,7 +49,7 @@ CREATE TABLE `berita` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `file_pendukung`
+-- Table structure for table `file_pendukung`
 --
 
 CREATE TABLE `file_pendukung` (
@@ -62,7 +62,7 @@ CREATE TABLE `file_pendukung` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jawaban`
+-- Table structure for table `jawaban`
 --
 
 CREATE TABLE `jawaban` (
@@ -82,7 +82,7 @@ CREATE TABLE `jawaban` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jawaban_tugas`
+-- Table structure for table `jawaban_tugas`
 --
 
 CREATE TABLE `jawaban_tugas` (
@@ -100,7 +100,7 @@ CREATE TABLE `jawaban_tugas` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jenis`
+-- Table structure for table `jenis`
 --
 
 CREATE TABLE `jenis` (
@@ -110,16 +110,17 @@ CREATE TABLE `jenis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `jenis`
+-- Dumping data for table `jenis`
 --
 
 INSERT INTO `jenis` (`id_jenis`, `nama`, `status`) VALUES
-('UTS', 'Ujian Tengah Semester', 'aktif');
+('UAS', 'Ujian Akhir Semester', 'aktif'),
+('UTS', 'Ujian Tengah Semester', 'tidak');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jurusan`
+-- Table structure for table `jurusan`
 --
 
 CREATE TABLE `jurusan` (
@@ -134,7 +135,7 @@ CREATE TABLE `jurusan` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `kelas`
+-- Table structure for table `kelas`
 --
 
 CREATE TABLE `kelas` (
@@ -149,7 +150,7 @@ CREATE TABLE `kelas` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `level`
+-- Table structure for table `level`
 --
 
 CREATE TABLE `level` (
@@ -161,7 +162,7 @@ CREATE TABLE `level` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `log`
+-- Table structure for table `log`
 --
 
 CREATE TABLE `log` (
@@ -175,7 +176,7 @@ CREATE TABLE `log` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `mapel`
+-- Table structure for table `mapel`
 --
 
 CREATE TABLE `mapel` (
@@ -202,7 +203,7 @@ CREATE TABLE `mapel` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `mata_pelajaran`
+-- Table structure for table `mata_pelajaran`
 --
 
 CREATE TABLE `mata_pelajaran` (
@@ -215,7 +216,7 @@ CREATE TABLE `mata_pelajaran` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `materi`
+-- Table structure for table `materi`
 --
 
 CREATE TABLE `materi` (
@@ -235,7 +236,7 @@ CREATE TABLE `materi` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `nilai`
+-- Table structure for table `nilai`
 --
 
 CREATE TABLE `nilai` (
@@ -268,7 +269,7 @@ CREATE TABLE `nilai` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pengawas`
+-- Table structure for table `pengawas`
 --
 
 CREATE TABLE `pengawas` (
@@ -316,17 +317,17 @@ CREATE TABLE `pengawas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `pengawas`
+-- Dumping data for table `pengawas`
 --
 
 INSERT INTO `pengawas` (`id_pengawas`, `nip`, `nama`, `jabatan`, `username`, `password`, `level`, `no_ktp`, `tempat_lahir`, `tgl_lahir`, `jenis_kelamin`, `agama`, `no_hp`, `email`, `alamat_jalan`, `rt_rw`, `dusun`, `kelurahan`, `kecamatan`, `kode_pos`, `nuptk`, `bidang_studi`, `jenis_ptk`, `tgs_tambahan`, `status_pegawai`, `status_aktif`, `status_nikah`, `sumber_gaji`, `ahli_lab`, `nama_ibu`, `nama_suami`, `nik_suami`, `pekerjaan`, `tmt`, `keahlian_isyarat`, `kewarganegaraan`, `npwp`, `foto`, `ptk_id`, `password2`, `ruang`) VALUES
 (1, '-', 'administrator', '', 'admin', '$2y$10$KUNIFi/JYf7d/tBHZyhSue5uzdspf2Khe4b6uMi51rWa5QPu4p/7O', 'admin', '', '', '0000-00-00', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '0000-00-00', '', '', '', '', NULL, NULL, NULL),
-(260, '-', 'PAJAR SIDIK', NULL, 'guru', '123', 'guru', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(260, '-', 'AMINU', NULL, 'guru', 'guru', 'guru', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pengumuman`
+-- Table structure for table `pengumuman`
 --
 
 CREATE TABLE `pengumuman` (
@@ -341,7 +342,7 @@ CREATE TABLE `pengumuman` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pk`
+-- Table structure for table `pk`
 --
 
 CREATE TABLE `pk` (
@@ -353,7 +354,7 @@ CREATE TABLE `pk` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `referensi_jurusan`
+-- Table structure for table `referensi_jurusan`
 --
 
 CREATE TABLE `referensi_jurusan` (
@@ -367,7 +368,7 @@ CREATE TABLE `referensi_jurusan` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `ruang`
+-- Table structure for table `ruang`
 --
 
 CREATE TABLE `ruang` (
@@ -379,7 +380,7 @@ CREATE TABLE `ruang` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `semester`
+-- Table structure for table `semester`
 --
 
 CREATE TABLE `semester` (
@@ -395,7 +396,7 @@ CREATE TABLE `semester` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `server`
+-- Table structure for table `server`
 --
 
 CREATE TABLE `server` (
@@ -404,10 +405,20 @@ CREATE TABLE `server` (
   `status` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `server`
+--
+
+INSERT INTO `server` (`kode_server`, `nama_server`, `status`) VALUES
+('SERVER01', 'SERVER01', 'aktif'),
+('SERVER02', 'SERVER02', 'aktif'),
+('SERVER03', 'SERVER03', 'aktif'),
+('SERVER04', 'SERVER04', 'aktif');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `sesi`
+-- Table structure for table `sesi`
 --
 
 CREATE TABLE `sesi` (
@@ -418,7 +429,7 @@ CREATE TABLE `sesi` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `session`
+-- Table structure for table `session`
 --
 
 CREATE TABLE `session` (
@@ -430,7 +441,7 @@ CREATE TABLE `session` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `setting`
+-- Table structure for table `setting`
 --
 
 CREATE TABLE `setting` (
@@ -465,16 +476,16 @@ CREATE TABLE `setting` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `setting`
+-- Dumping data for table `setting`
 --
 
 INSERT INTO `setting` (`id_setting`, `aplikasi`, `kode_sekolah`, `sekolah`, `jenjang`, `kepsek`, `nip`, `alamat`, `kecamatan`, `kota`, `telp`, `fax`, `web`, `email`, `logo`, `header`, `header_kartu`, `nama_ujian`, `versi`, `ip_server`, `waktu`, `server`, `id_server`, `url_host`, `token_api`, `sekolah_id`, `npsn`, `db_versi`) VALUES
-(1, 'ANT CBT', 'K05150115', 'SMK ABDI NEGARA TUBAN', 'SMK', 'Nanang Slamet Mulyono, M.Pd', '-', 'Jl. Dr. Wahidin SH No. 798 Tuban<br />\r\n', 'Tuban', 'Tuban', '03568832043', '-', 'smkabdinegara.sch.id', 'smk.abdinegara798@gmail.com', 'dist/img/logo17.png', '', 'KARTU PESERTA', 'Penilaian Akhir Tahun', '2.5', 'http://192.168.0.200/antcbt', 'Asia/Jakarta', 'pusat', 'SR01', 'xxxxxx', 'VKLuYN7Lwjjwu', '8cce47df-aae7-4274-83cb-5af3093eab56', '69787351', '2.8.1');
+(1, 'ANT CBT', 'K05150115', 'SMK ABDI NEGARA TUBAN', 'SMK', 'Nanang Slamet Mulyono, M.Pd', '-', 'Jl. Dr. Wahidin SH No. 798 Tuban<br />\r\n', 'Tuban', 'Tuban', '03568832043', '-', 'smkabdinegara.sch.id', 'smk.abdinegara798@gmail.com', 'dist/img/logo17.png', '', 'KARTU PESERTA', 'Ujian Akhir Semester', '2.5', 'http://192.168.0.200/antcbt', 'Asia/Jakarta', 'pusat', 'SR01', 'xxxxxx', 'VKLuYN7Lwjjwu', '8cce47df-aae7-4274-83cb-5af3093eab56', '69787351', '2.8.1');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `sinkron`
+-- Table structure for table `sinkron`
 --
 
 CREATE TABLE `sinkron` (
@@ -486,7 +497,7 @@ CREATE TABLE `sinkron` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `sinkron`
+-- Dumping data for table `sinkron`
 --
 
 INSERT INTO `sinkron` (`nama_data`, `data`, `jumlah`, `tanggal`, `status_sinkron`) VALUES
@@ -498,7 +509,7 @@ INSERT INTO `sinkron` (`nama_data`, `data`, `jumlah`, `tanggal`, `status_sinkron
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `siswa`
+-- Table structure for table `siswa`
 --
 
 CREATE TABLE `siswa` (
@@ -556,13 +567,14 @@ CREATE TABLE `siswa` (
   `semester_id` varchar(10) DEFAULT NULL,
   `rombongan_belajar_id` varchar(50) DEFAULT NULL,
   `status` int(1) DEFAULT 1,
-  `online` int(1) DEFAULT 0
+  `online` int(1) DEFAULT 0,
+  `no_meja` varchar(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `soal`
+-- Table structure for table `soal`
 --
 
 CREATE TABLE `soal` (
@@ -589,7 +601,7 @@ CREATE TABLE `soal` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `token`
+-- Table structure for table `token`
 --
 
 CREATE TABLE `token` (
@@ -600,7 +612,7 @@ CREATE TABLE `token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `token`
+-- Dumping data for table `token`
 --
 
 INSERT INTO `token` (`id_token`, `token`, `time`, `masa_berlaku`) VALUES
@@ -609,7 +621,7 @@ INSERT INTO `token` (`id_token`, `token`, `time`, `masa_berlaku`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tugas`
+-- Table structure for table `tugas`
 --
 
 CREATE TABLE `tugas` (
@@ -629,7 +641,7 @@ CREATE TABLE `tugas` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `ujian`
+-- Table structure for table `ujian`
 --
 
 CREATE TABLE `ujian` (
@@ -671,283 +683,280 @@ CREATE TABLE `ujian` (
 --
 
 --
--- Indeks untuk tabel `berita`
+-- Indexes for table `berita`
 --
 ALTER TABLE `berita`
   ADD PRIMARY KEY (`id_berita`);
 
 --
--- Indeks untuk tabel `file_pendukung`
+-- Indexes for table `file_pendukung`
 --
 ALTER TABLE `file_pendukung`
   ADD PRIMARY KEY (`id_file`);
 
 --
--- Indeks untuk tabel `jawaban`
+-- Indexes for table `jawaban`
 --
 ALTER TABLE `jawaban`
   ADD PRIMARY KEY (`id_jawaban`);
 
 --
--- Indeks untuk tabel `jawaban_tugas`
+-- Indexes for table `jawaban_tugas`
 --
 ALTER TABLE `jawaban_tugas`
   ADD PRIMARY KEY (`id_jawaban`);
 
 --
--- Indeks untuk tabel `jenis`
+-- Indexes for table `jenis`
 --
 ALTER TABLE `jenis`
   ADD PRIMARY KEY (`id_jenis`);
 
 --
--- Indeks untuk tabel `jurusan`
+-- Indexes for table `jurusan`
 --
 ALTER TABLE `jurusan`
   ADD PRIMARY KEY (`jurusan_id`);
 
 --
--- Indeks untuk tabel `kelas`
+-- Indexes for table `kelas`
 --
 ALTER TABLE `kelas`
   ADD PRIMARY KEY (`id_kelas`);
 
 --
--- Indeks untuk tabel `level`
+-- Indexes for table `level`
 --
 ALTER TABLE `level`
   ADD PRIMARY KEY (`kode_level`);
 
 --
--- Indeks untuk tabel `log`
+-- Indexes for table `log`
 --
 ALTER TABLE `log`
   ADD PRIMARY KEY (`id_log`);
 
 --
--- Indeks untuk tabel `mapel`
+-- Indexes for table `mapel`
 --
 ALTER TABLE `mapel`
   ADD PRIMARY KEY (`id_mapel`);
 
 --
--- Indeks untuk tabel `mata_pelajaran`
+-- Indexes for table `mata_pelajaran`
 --
 ALTER TABLE `mata_pelajaran`
   ADD PRIMARY KEY (`kode_mapel`);
 
 --
--- Indeks untuk tabel `materi`
+-- Indexes for table `materi`
 --
 ALTER TABLE `materi`
   ADD PRIMARY KEY (`id_materi`);
 
 --
--- Indeks untuk tabel `nilai`
+-- Indexes for table `nilai`
 --
 ALTER TABLE `nilai`
   ADD PRIMARY KEY (`id_nilai`),
   ADD KEY `id_mapel` (`id_mapel`);
 
 --
--- Indeks untuk tabel `pengawas`
+-- Indexes for table `pengawas`
 --
 ALTER TABLE `pengawas`
   ADD PRIMARY KEY (`id_pengawas`);
 
 --
--- Indeks untuk tabel `pengumuman`
+-- Indexes for table `pengumuman`
 --
 ALTER TABLE `pengumuman`
   ADD PRIMARY KEY (`id_pengumuman`);
 
 --
--- Indeks untuk tabel `pk`
+-- Indexes for table `pk`
 --
 ALTER TABLE `pk`
   ADD PRIMARY KEY (`id_pk`);
 
 --
--- Indeks untuk tabel `referensi_jurusan`
+-- Indexes for table `referensi_jurusan`
 --
 ALTER TABLE `referensi_jurusan`
   ADD PRIMARY KEY (`jurusan_id`);
 
 --
--- Indeks untuk tabel `ruang`
+-- Indexes for table `ruang`
 --
 ALTER TABLE `ruang`
   ADD PRIMARY KEY (`kode_ruang`);
 
 --
--- Indeks untuk tabel `semester`
+-- Indexes for table `semester`
 --
 ALTER TABLE `semester`
   ADD PRIMARY KEY (`semester_id`);
 
 --
--- Indeks untuk tabel `sesi`
+-- Indexes for table `sesi`
 --
 ALTER TABLE `sesi`
   ADD PRIMARY KEY (`kode_sesi`);
 
 --
--- Indeks untuk tabel `session`
+-- Indexes for table `session`
 --
 ALTER TABLE `session`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `setting`
+-- Indexes for table `setting`
 --
 ALTER TABLE `setting`
   ADD PRIMARY KEY (`id_setting`);
 
 --
--- Indeks untuk tabel `sinkron`
+-- Indexes for table `sinkron`
 --
 ALTER TABLE `sinkron`
   ADD PRIMARY KEY (`nama_data`);
 
 --
--- Indeks untuk tabel `siswa`
+-- Indexes for table `siswa`
 --
 ALTER TABLE `siswa`
   ADD PRIMARY KEY (`id_siswa`);
 
 --
--- Indeks untuk tabel `soal`
+-- Indexes for table `soal`
 --
 ALTER TABLE `soal`
   ADD PRIMARY KEY (`id_soal`);
 
 --
--- Indeks untuk tabel `token`
+-- Indexes for table `token`
 --
 ALTER TABLE `token`
   ADD PRIMARY KEY (`id_token`);
 
 --
--- Indeks untuk tabel `tugas`
+-- Indexes for table `tugas`
 --
 ALTER TABLE `tugas`
   ADD PRIMARY KEY (`id_tugas`);
 
 --
--- Indeks untuk tabel `ujian`
+-- Indexes for table `ujian`
 --
 ALTER TABLE `ujian`
   ADD PRIMARY KEY (`id_ujian`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `berita`
+-- AUTO_INCREMENT for table `berita`
 --
 ALTER TABLE `berita`
   MODIFY `id_berita` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `file_pendukung`
+-- AUTO_INCREMENT for table `file_pendukung`
 --
 ALTER TABLE `file_pendukung`
   MODIFY `id_file` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `jawaban`
+-- AUTO_INCREMENT for table `jawaban`
 --
 ALTER TABLE `jawaban`
   MODIFY `id_jawaban` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `jawaban_tugas`
+-- AUTO_INCREMENT for table `jawaban_tugas`
 --
 ALTER TABLE `jawaban_tugas`
   MODIFY `id_jawaban` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `log`
+-- AUTO_INCREMENT for table `log`
 --
 ALTER TABLE `log`
   MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `mapel`
+-- AUTO_INCREMENT for table `mapel`
 --
 ALTER TABLE `mapel`
   MODIFY `id_mapel` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `materi`
+-- AUTO_INCREMENT for table `materi`
 --
 ALTER TABLE `materi`
   MODIFY `id_materi` int(255) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `nilai`
+-- AUTO_INCREMENT for table `nilai`
 --
 ALTER TABLE `nilai`
   MODIFY `id_nilai` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `pengawas`
+-- AUTO_INCREMENT for table `pengawas`
 --
 ALTER TABLE `pengawas`
   MODIFY `id_pengawas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=261;
 
 --
--- AUTO_INCREMENT untuk tabel `pengumuman`
+-- AUTO_INCREMENT for table `pengumuman`
 --
 ALTER TABLE `pengumuman`
   MODIFY `id_pengumuman` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT untuk tabel `session`
+-- AUTO_INCREMENT for table `session`
 --
 ALTER TABLE `session`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `setting`
+-- AUTO_INCREMENT for table `setting`
 --
 ALTER TABLE `setting`
   MODIFY `id_setting` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT untuk tabel `siswa`
+-- AUTO_INCREMENT for table `siswa`
 --
 ALTER TABLE `siswa`
   MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `soal`
+-- AUTO_INCREMENT for table `soal`
 --
 ALTER TABLE `soal`
   MODIFY `id_soal` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `token`
+-- AUTO_INCREMENT for table `token`
 --
 ALTER TABLE `token`
   MODIFY `id_token` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT untuk tabel `tugas`
+-- AUTO_INCREMENT for table `tugas`
 --
 ALTER TABLE `tugas`
   MODIFY `id_tugas` int(255) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `ujian`
+-- AUTO_INCREMENT for table `ujian`
 --
 ALTER TABLE `ujian`
   MODIFY `id_ujian` int(5) NOT NULL AUTO_INCREMENT;
-
---
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
---
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

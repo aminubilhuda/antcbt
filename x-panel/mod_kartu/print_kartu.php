@@ -78,7 +78,7 @@ $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id
                 <hr>
                 <table style="text-align:left; width:100%">
                     <tr>
-                        <td style="text-align:center; vertical-align:top; width:100px" rowspan="8">
+                        <td style="text-align:center; vertical-align:top; width:100px" rowspan="9">
                             <?php
                                 if ($siswa['foto'] <> '') {
                                     if (!file_exists("../foto/fotosiswa/$siswa[foto]")) {
@@ -116,6 +116,10 @@ $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id
 
                     </tr>
                     <tr>
+                        <td class="ukuran" valign='top'>No Meja</td>
+                        <td class="ukuran" valign='top'>: <b class="user"><?= $siswa['no_meja'] ?></b></td>
+                    </tr>
+                    <tr>
                         <td class="ukuran" valign='top'>Ruang</td>
                         <td class="ukuran" valign='top'>: <?= $siswa['ruang'] ?>
                             <div style="padding-top: 12px; padding-left: 49px;" class="ttd"><img
@@ -136,7 +140,7 @@ $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id
                     </tr>
                 </table>
             </div>
-            <?php if (($no % 8) == 0) : ?>
+            <?php if (($no % 6) == 0) : ?>
             <div style='page-break-before:always;'></div>
             <?php endif; ?>
         </td>
