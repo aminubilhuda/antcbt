@@ -82,32 +82,32 @@ $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id
                             <?php
                                 if ($siswa['foto'] <> '') {
                                     if (!file_exists("../foto/fotosiswa/$siswa[foto]")) {
-                                        echo "<img src='$homeurl/dist/img/avatar_default.png' class='img'  style='max-width:60px' alt='+'>";
+                                        echo "<img src='$homeurl/dist/img/avatar_default.png' class='img'  style='max-width:50px' alt='+'>";
                                     } else {
-                                        echo "<img src='$homeurl/foto/fotosiswa/$siswa[foto]' class='img'  style='max-width:60px' >";
+                                        echo "<img src='$homeurl/foto/fotosiswa/$siswa[foto]' class='img'  style='max-width:50px' >";
                                     }
                                 } else {
-                                    echo "<img src='$homeurl/dist/img/avatar-01.jpg' class='img'  style='max-width:60px' alt='+'>";
+                                    echo "<img src='$homeurl/dist/img/avatar-01.jpg' class='img'  style='max-width:50px' alt='+'>";
                                 }
 
                                 ?>
                         </td>
                     </tr>
                     <tr>
-                        <td class="ukuran" valign='top' width="30%">No Peserta</td>
+                        <td class="ukuran" valign='top' width="23%">No Peserta</td>
                         <td class="ukuran" valign='top'>: <?= $siswa['no_peserta'] ?></td>
                     </tr>
                     <tr>
-                        <td class="ukuran" valign='top'>Nama</td>
-                        <td class="ukuran2" valign='top'>: <?= $siswa['nama'] ?></td>
+                        <td class="ukuran" valign='top'> Nama</td>
+                        <td class="ukuran2" valign='top'>: <b class="ukuran2"><?= $siswa['nama'] ?></b></td>
                     </tr>
                     <tr>
-                        <td class="ukuran" valign='top'>Kelas / Sesi Ujian</td>
+                        <td class="ukuran" valign='top'>Kelas / Sesi</td>
                         <td class="ukuran" valign='top'>: <?= $kelas['nama'] ?> / Sesi <?= $siswa['sesi'] ?></td>
                     </tr>
                     <tr>
                         <td class="ukuran" valign='top'>Username</td>
-                        <td class="ukuran" valign='top'>:<b class="user"> <?= $siswa['username'] ?></b></td>
+                        <td class="ukuran" valign='top'>: <b class="user"><?= $siswa['username'] ?></b></td>
                     </tr>
                     <tr>
 
