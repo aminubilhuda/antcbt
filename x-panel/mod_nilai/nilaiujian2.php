@@ -27,7 +27,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                     <div class='box-tools pull-right btn-grou'>
                         <button class='btn btn-sm btn-primary' onclick="frames['frameresult'].print()"><i class='fa fa-print'></i> Print</button>
                         <iframe name='frameresult' src='mod_nilai/report.php?m=<?= $id_mapel ?>&k=<?= $id_kelas ?>' style='display:none'></iframe>
-                        <a class='btn btn-sm btn-success' href='mod_nilai/report_excel_permapel.php?m=<?= $id_mapel ?>'><i class='fa fa-download'></i> Download Excel</a>
+                        <a class='btn btn-sm btn-success' href='mod_nilai/report_excel_permapel.php?m=<?= $id_mapel ?>&k=<?= $id_kelas ?>'><i class='fa fa-download'></i> Download Excel</a>
                         <a class='btn btn-sm btn-danger' href='?pg=jadwal'><i class='fa fa-times'></i></a>
                     </div>
                 </div><!-- /.box-header -->
