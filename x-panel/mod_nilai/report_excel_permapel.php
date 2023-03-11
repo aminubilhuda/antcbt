@@ -33,7 +33,7 @@ header("Content-Disposition: attachment; filename=" . $file . ".xls"); ?>
 		<td colspan="27" style="text-align:center;">SMK ABDI NEGARA TUBAN</td>
 	</tr>
 	<tr>
-		<td colspan="27" style="text-align:center;">TAHUN PELAJARAN 2020/2021</td>
+		<td colspan="27" style="text-align:center;">TAHUN PELAJARAN 2022/2023</td>
 	</tr>
 </table>
 
