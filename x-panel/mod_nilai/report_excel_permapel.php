@@ -1,149 +1,162 @@
 <?php
 require("../../config/config.default.php");
-require("../../config/config.function.php");
 require("../../config/functions.crud.php");
-require("../../config/dis.php");
-echo "<style> .str{ mso-number-format:\@; } </style>";
+require '../../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+
 $id_ujian = $_GET['m'];
 $id_kelas = $_GET['k'];
-$mapel = fetch($koneksi, 'mapel', array('id_mapel' => $id_ujian));
-$mata_pelajaran = fetch($koneksi, 'mata_pelajaran', array('kode_mapel'=>$mapel['kode']));
+
+$mapel = fetch($koneksi, 'mapel', ['id_mapel' => $id_ujian]);
+$mata_pelajaran = fetch($koneksi, 'mata_pelajaran', ['kode_mapel' => $mapel['kode']]);
 $id_mapel = $mapel['id_mapel'];
-if (date('m') >= 7 and date('m') <= 12) {
-	$ajaran = date('Y') . "/" . (date('Y') + 1);
-} elseif (date('m') >= 1 and date('m') <= 6) {
-	$ajaran = (date('Y') - 1) . "/" . date('Y');
+
+$ajaran = (date('m') >= 7 && date('m') <= 12) ? date('Y') . "/" . (date('Y') + 1) : (date('Y') - 1) . "/" . date('Y');
+$file_name = "NILAI_" . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $id_kelas . "_" . $mapel['nama']) . ".xlsx";
+
+$spreadsheet = new Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
+
+// Header Laporan
+$sheet->setCellValue('A1', 'DAFTAR NILAI')->mergeCells('A1:H1');
+$sheet->setCellValue('A2', 'UJIAN SATUAN PENDIDIKAN')->mergeCells('A2:H2');
+$sheet->setCellValue('A3', 'SMK ABDI NEGARA TUBAN')->mergeCells('A3:H3');
+$sheet->setCellValue('A4', 'TAHUN PELAJARAN ' . $ajaran)->mergeCells('A4:H4');
+
+// Atur gaya header laporan
+$sheet->getStyle('A1:A4')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 14,
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+    ],
+]);
+
+$sheet->setCellValue('A6', 'Mata Pelajaran: ' . $mata_pelajaran['nama_mapel']);
+$sheet->setCellValue('A7', 'Jumlah Soal: ' . $mapel['jml_soal'] . ' PG');
+
+// Header Tabel
+$headers = ['No.', 'NIS', 'Nama', 'Kelas', 'Benar', 'Salah', 'Nilai'];
+$columnIndex = 'A';
+foreach ($headers as $header) {
+    $sheet->setCellValue($columnIndex . '9', $header);
+    $columnIndex++;
 }
-$file = "NILAI_" . $id_kelas . "_" . $mapel['nama'];
-$file = str_replace(" ", "-", $file);
-$file = str_replace(":", "", $file);
-header("Content-type: application/octet-stream");
-header("Pragma: no-cache");
-header("Expires: 0");
-header("Content-Disposition: attachment; filename=" . $file . ".xls"); ?>
 
-<table style="font-weight:bold;">
-	<tr>
-		<td colspan="27" style="text-align:center;">DAFTAR NILAI</td>
-	</tr>
-	<tr>
-		<td colspan="27" style="text-align:center;">UJIAN SATUAN PENDIDIKAN</td>
-	</tr>
-	<tr>
-		<td colspan="27" style="text-align:center;">SMK ABDI NEGARA TUBAN</td>
-	</tr>
-	<tr>
-		<td colspan="27" style="text-align:center;">TAHUN PELAJARAN 2022/2023</td>
-	</tr>
-</table>
+// Tambahkan kolom untuk jawaban dan atur lebarnya
+for ($i = 1; $i <= $mapel['jml_soal']; $i++) {
+    $sheet->setCellValue($columnIndex . '9', 'S' . $i);
+    $sheet->getColumnDimension($columnIndex)->setWidth(4.25);
+    $columnIndex++;
+}
 
-Mata Pelajaran : <?= $mata_pelajaran['nama_mapel'] ?><br />
-Jumlah Soal : <?= $mapel['jml_soal'] ?> PG<br />
+// Atur gaya header tabel
+$sheet->getStyle('A9:' . $columnIndex . '9')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'color' => ['argb' => 'FFFFFF'],
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => '4CAF50'],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+        ],
+    ],
+]);
 
-<table border='1'>
-	<tr>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">No.</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">NIS</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">Nama</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">Kelas</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">Benar</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">Salah</td>
-		<td rowspan='2' style="vertical-align:middle; text-align:center;">Nilai</td>
-		<td colspan='<?= $mapel['jml_soal'] ?>' style="vertical-align:middle; text-align:center;">Jawaban</td>
+// Fetch Data Siswa
+$siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas = '$id_kelas' ORDER BY nama ASC");
+if (!$siswaQ) {
+    die("Tidak ada data siswa untuk kelas ini.");
+}
 
-	</tr>
-	<tr><?php
-		for ($num = 1; $num <= $mapel['jml_soal']; $num++) {
-			$soal = fetch($koneksi, 'soal', array('id_mapel' => $id_mapel, 'nomor' => $num));
-		?>
-			<td><?= $num ?></td>
-		<?php } ?>
-		<?php
-		for ($num = 1; $num <= $mapel['jml_esai']; $num++) {
-			$soal = fetch($koneksi, 'soal', array('id_mapel' => $id_mapel, 'nomor' => $num));
-		?>
-			<td><?= $num ?></td>
-		<?php } ?>
+$row = 10;
+$no = 1;
 
-	</tr>
+while ($siswa = mysqli_fetch_assoc($siswaQ)) {
+    $sheet->setCellValue('A' . $row, $no++);
+    $sheet->setCellValue('B' . $row, $siswa['nis']);
+    $sheet->setCellValue('C' . $row, $siswa['nama']);
+    $sheet->setCellValue('D' . $row, $siswa['id_kelas']);
 
-	<?php
+    $query_nilai = mysqli_query($koneksi, "SELECT * FROM nilai WHERE id_mapel = '$id_mapel' AND id_siswa = '" . $siswa['id_siswa'] . "'");
+    if (mysqli_num_rows($query_nilai) > 0) {
+        $nilai = mysqli_fetch_assoc($query_nilai);
+        $sheet->setCellValue('E' . $row, $nilai['jml_benar']);
+        $sheet->setCellValue('F' . $row, $nilai['jml_salah']);
+        $sheet->setCellValue('G' . $row, round($nilai['skor'], 2));
 
-	$siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas = '$id_kelas' ORDER BY nama ASC");
-	$betul = array();
-	$salah = array();
-	while ($siswa = mysqli_fetch_array($siswaQ)) {
-		$no++;
-		$benar = $salah = 0;
-		$skor = $lama = '-';
-		$query_nilai = mysqli_query($koneksi, "SELECT * FROM nilai WHERE id_mapel = '".$id_mapel."' AND id_siswa = '".$siswa['id_siswa']."'");
-		$nilai = mysqli_fetch_array($query_nilai);
-		// $nilai = fetch($koneksi, 'nilai', array('id_mapel' => $id_mapel, 'id_siswa' => $siswa['id_siswa']));
-	?>
-		<tr>
-			<td><?= $no ?></td>
-			<td><?= $siswa['nis'] ?></td>
-			<td><?= $siswa['nama'] ?></td>
-			<td><?= $siswa['id_kelas'] ?></td>
-			<td><?= $nilai['jml_benar'] ?></td>
-			<td><?= $nilai['jml_salah'] ?></td>
-			<td class='str'><?= round($nilai['skor'], 2) ?></td>
-			<?php
+        $jawaban = unserialize($nilai['jawaban']);
+        $column = 'H';
 
-			if (mysqli_num_rows($query_nilai) != 0) {
-				$jawaban = unserialize($nilai['jawaban']);
-				foreach ($jawaban as $key => $value) {
+        foreach ($jawaban as $key => $value) {
+            $soal = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM soal WHERE id_soal = '$key'"));
+            $warna = ($value == $soal['jawaban']) ? '00FF00' : (($value == 'X') ? 'FFEB3B' : 'F44336');
+            $sheet->setCellValue($column . $row, $value);
+            $sheet->getStyle($column . $row)
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()
+                ->setARGB($warna);
+            $column++;
+        }
+    } else {
+        $sheet->setCellValue('E' . $row, 'Tidak mengikuti ujian');
+    }
 
-					$soal = mysqli_fetch_array(mysqli_query($koneksi, "select * from soal where id_soal='$key' order by nomor ASC"));
-					$nomor = $soal['nomor'];
-					if ($soal) {
-						if ($value == $soal['jawaban']) { ?>
+    // Terapkan border untuk baris saat ini
+    $sheet->getStyle('A' . $row . ':' . $columnIndex . $row)->applyFromArray([
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color' => ['argb' => '000000'],
+            ],
+        ],
+    ]);
 
-							<td style='background:#00FF00;'><?= $value ?></td>
-						<?php } else { ?>
-							<?php if ($value == 'X') { ?>
-								<td style='background:#bbd1de;'><?= $value ?></td>
-							<?php } else { ?>
-								<td style='background:#FF0000;'><?= $value ?></td>
-							<?php } ?>
-						<?php }
-					} else { ?>
-						<td>-</td>
-				<?php }
-				}
-			} else {
-				echo "<td colspan='".$mapel['jml_soal']."'>Tidak mengikuti ujian</td>";
-			}
-			?>
-		</tr>
+    $row++;
+}
 
-	<?php } ?>
+// Menambahkan border ke seluruh tabel (termasuk header)
+$lastColumn = chr(ord('A') + ($mapel['jml_soal'] + 6)); // Hitung kolom terakhir (jumlah soal + kolom tetap)
+$lastRow = $row - 1;
 
-</table>
+$sheet->getStyle('A9:' . $lastColumn . $lastRow)->applyFromArray([
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['argb' => '000000'],
+        ],
+    ],
+]);
 
-<!-- <br>
-<table border='1'>
-	<tr>
-		<th>No.</th>
-		<th>Soal</th>
-		<th>Menjawab Benar</th>
-		<th>Menjawab Salah</th>
-		<th>Kategori</th>
-	</tr>
-	<?php
+// Atur perataan data tabel
+$sheet->getStyle('A10:' . $lastColumn . $lastRow)->applyFromArray([
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+]);
 
-	$soalq = mysqli_query($koneksi, "SELECT * FROM soal a join mapel b ON a.id_mapel=b.id_mapel  ORDER BY nomor ASC");
+$writer = new Xlsx($spreadsheet);
 
-	while ($soal = mysqli_fetch_array($soalq)) {
-		$no++;
-		$nomor = $soal['nomor'];
-	?>
-		<tr>
-			<td><?= $soal['nomor'] ?></td>
-			<td><?= $soal['soal'] ?></td>
-			
-		</tr>
-
-	<?php } ?>
-
-</table> -->
+// Header untuk unduhan file
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header("Content-Disposition: attachment; filename=\"$file_name\"");
+header('Cache-Control: max-age=0');
+$writer->save('php://output');
+exit;

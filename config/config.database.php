@@ -1,8 +1,9 @@
 <?php
 //konfigurasi server database
 $host = 'localhost';
-$user = 'root';
-$pass = '';
+// $user = 'root';
+$user = 'abdinega_abdira';
+$pass = 'abdinega_abdira';
 $debe = 'antcbt';
 
 
