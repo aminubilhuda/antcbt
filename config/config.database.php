@@ -2,8 +2,8 @@
 //konfigurasi server database
 $host = 'localhost';
 // $user = 'root';
-$user = 'abdinega_abdira';
-$pass = 'abdinega_abdira';
+$user = 'root';
+$pass = '';
 $debe = 'antcbt';
 
 
