@@ -35,13 +35,13 @@ while ($row = mysqli_fetch_array($siswaQ)) {
 }
 
 .ukuran {
-    font-size: 12px;
+    font-size: 11px;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
 .ukuran2 {
-    font-size: 13px;
+    font-size: 12px;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -59,6 +59,12 @@ while ($row = mysqli_fetch_array($siswaQ)) {
 
 .page-break {
     page-break-after: always;
+    page-break-inside: avoid;
+}
+@media print {
+    tr {
+        page-break-inside: avoid;
+    }
 }
 .signature-container {
     display: flex;
@@ -68,13 +74,13 @@ while ($row = mysqli_fetch_array($siswaQ)) {
 }
 
 .signature-container img {
-    max-height: 60px;
+    max-height: 45px;
     /* margin-bottom: 10px; */
     /* position: relative; */
 }
 </style>
 
-<table width='100%' align='center' cellpadding='10'>
+<table width='100%' align='center' cellpadding='5'>
     <?php 
     $total_students = count($siswa_array);
     for ($i = 0; $i < $total_students; $i += 2) : 
@@ -86,11 +92,11 @@ while ($row = mysqli_fetch_array($siswaQ)) {
                 $nopeserta = $siswa['no_peserta'];
             ?>
             <td width='50%'>
-                <div style='width:10.4cm;border:1px solid #666;'>
+                <div style='width:9.8cm;border:1px solid #666;'>
                     <table style="text-align:center; width:100%">
                         <tr>
                             <td style="text-align:left; vertical-align:top">
-                                <img src='../../foto/logo_tut.svg' height='50px'>
+                                <img src='../../foto/logo_tut.svg' height='40px'>
                             </td>
                             <td style="text-align:center">
                                 <b class="ukuran responsive-text">
@@ -100,7 +106,7 @@ while ($row = mysqli_fetch_array($siswaQ)) {
                                 </b>
                             </td>
                             <td style="text-align:right; vertical-align:top">
-                                <img src="../../<?= $setting['logo'] ?>" height='50px' />
+                                <img src="../../<?= $setting['logo'] ?>" height='40px' />
                             </td>
                         </tr>
                     </table>
@@ -164,11 +170,14 @@ while ($row = mysqli_fetch_array($siswaQ)) {
     </tr>
     
     <?php 
-    // Add page break every 6 cards
-    if (($i + 2) % 6 == 0) : 
+    // Add page break every 8 cards and ensure proper spacing
+    if (($i + 2) % 8 == 0 && ($i + 2) < $total_students) : 
     ?>
     <tr>
-        <td colspan="2" class="page-break"></td>
+        <td colspan="2">
+            <div style="height: 20px;"></div>
+            <div class="page-break"></div>
+        </td>
     </tr>
     <?php endif; ?>
     
