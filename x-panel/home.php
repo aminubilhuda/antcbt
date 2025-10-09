@@ -1,4 +1,5 @@
 <?php
+$siswa = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM siswa"));
 $testongoing = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM nilai WHERE ujian_mulai!='' AND ujian_selesai=''"));
 $testdone = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM nilai WHERE ujian_mulai!='' AND ujian_selesai!=''"));
 if ($siswa <> 0) {
@@ -13,7 +14,6 @@ if ($siswa <> 0) {
 }
 $nilai = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM nilai"));
 $soal = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM mapel"));
-$siswa = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM siswa"));
 $ruang = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM ruang"));
 $kelas = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM kelas"));
 $mapel = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM mata_pelajaran"));
