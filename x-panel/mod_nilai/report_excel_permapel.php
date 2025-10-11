@@ -102,7 +102,7 @@ if ($query_soal) {
 }
 
 // Fetch Data Siswa
-$siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas = '$id_kelas' ORDER BY nama ASC");
+$siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas = '$id_kelas' ORDER BY nisn ASC");
 if (!$siswaQ) {
     die("Tidak ada data siswa untuk kelas ini.");
 }
