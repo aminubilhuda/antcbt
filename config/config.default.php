@@ -1,17 +1,20 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
-error_reporting(0);
 (isset($_SESSION['id_user'])) ? $id_user = $_SESSION['id_user'] : $id_user = 0;
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 //JIKA DIINSTAL DISUBDOMAIN HOSTING HAPUS BARIS DIBAWAH INI
 $uri = $_SERVER['REQUEST_URI'];
 $pageurl = explode("/", $uri);
 if ($uri == '/') {
-	$homeurl = "http://" . $_SERVER['HTTP_HOST'];
+	$homeurl = $protocol . $_SERVER['HTTP_HOST'];
 	(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
 	(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
 	(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
 } else {
-	$homeurl = "http://" . $_SERVER['HTTP_HOST'] . "/" . $pageurl[1];
+	$homeurl = $protocol . $_SERVER['HTTP_HOST'] . "/" . $pageurl[1];
 	(isset($pageurl[2])) ? $pg = $pageurl[2] : $pg = '';
 	(isset($pageurl[3])) ? $ac = $pageurl[3] : $ac = '';
 	(isset($pageurl[4])) ? $id = $pageurl[4] : $id = 0;
@@ -23,7 +26,7 @@ if ($uri == '/') {
 //$uri = $_SERVER['REQUEST_URI'];
 //$pageurl = explode("/",$uri);
 
-//$homeurl = "http://".$_SERVER['HTTP_HOST'];
+//$homeurl = $protocol.$_SERVER['HTTP_HOST'];
 //(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
 //(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
 //(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
