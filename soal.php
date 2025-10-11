@@ -2,6 +2,13 @@
 require("config/config.default.php");
 require("config/config.function.php");
 require("config/functions.crud.php");
+$pg = @$_POST['pg'];
+$id_siswa = (isset($_SESSION['id_siswa'])) ? $_SESSION['id_siswa'] : 0;
+$id = @$_POST['id'];
+$audio = array('mp3', 'wav', 'ogg', 'MP3', 'WAV', 'OGG');
+$image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 'BMP');
+?>
+<?php if ($pg == 'soal') { 
 $soalx = $_POST['soal'];
 $soalx = dekripsi($soalx);
 $decoded = json_decode($soalx, true);
@@ -9,17 +16,9 @@ $pengacak = $_POST['pengacak'];
 $pengacak = explode(',', $pengacak);
 $pengacakpil = $_POST['pengacakpil'];
 $pengacakpil = explode(',', $pengacakpil);
-$id_siswa = (isset($_SESSION['id_siswa'])) ? $_SESSION['id_siswa'] : 0;
 $ujiannya = dekripsi($_POST['ujian']);
 $mapel = json_decode($ujiannya, true);
-$pg = @$_POST['pg'];
 $ac = $mapel[0]['id_ujian'];
-$id = @$_POST['id'];
-$audio = array('mp3', 'wav', 'ogg', 'MP3', 'WAV', 'OGG');
-$image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 'BMP');
-?>
-<?php if ($pg == 'soal') { ?>
-    <?php
     $no_soal = $_POST['no_soal'];
     $no_prev = $no_soal - 1;
     $no_next = $no_soal + 1;
@@ -41,15 +40,16 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
     foreach ($decoded as $soal) {
         if ($soal['id_soal'] == $pengacak[$nosoal]) {
             $jawab = fetch($koneksi, 'jawaban', array('id_siswa' => $id_siswa, 'id_mapel' => $id_mapel, 'id_soal' => $soal['id_soal'], 'id_ujian' => $ac));
+if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
     ?>
-            <div class='box-body'>
-                <div class='row'>
-                    <div class='col-md-12'>
-                        <div class='callout soal'>
-                            <div class='soaltanya animated fadeIn'><?= $soal['soal'] ?></div>
-                        </div>
-                        <div class='col-md-12'>
-                            <?php
+<div class='box-body'>
+  <div class='row'>
+    <div class='col-md-12'>
+      <div class='callout soal'>
+        <div class='soaltanya animated fadeIn'><?= $soal['soal'] ?></div>
+      </div>
+      <div class='col-md-12'>
+        <?php
                             if ($soal['file'] <> '') {
                                 $ext = explode(".", $soal['file']);
                                 $ext = end($ext);
@@ -73,12 +73,12 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                 }
                             }
                             ?>
-                        </div>
-                    </div>
-                    <?php if ($soal['jenis'] == 1) { ?>
-                        <div class='col-md-12'>
-                            <?php if ($mapel[0]['ulang'] == '1') : ?>
-                                <?php
+      </div>
+    </div>
+    <?php if ($soal['jenis'] == 1) { ?>
+    <div class='col-md-12'>
+      <?php if ($mapel[0]['ulang'] == '1') : ?>
+      <?php
                                 if ($mapel[0]['opsi'] == 3) {
                                     $kali = 3;
                                 } elseif ($mapel[0]['opsi'] == 4) {
@@ -126,8 +126,8 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
 
 
                                 ?>
-                                <?php if ($soal['pilA'] == '' and $soal['fileA'] == '' and $soal['pilB'] == '' and $soal['fileB'] == '' and $soal['pilC'] == '' and $soal['fileC'] == '' and $soal['pilD'] == '' and $soal['fileD'] == '') { ?>
-                                    <?php
+      <?php if ($soal['pilA'] == '' and $soal['fileA'] == '' and $soal['pilB'] == '' and $soal['fileB'] == '' and $soal['pilC'] == '' and $soal['fileC'] == '' and $soal['pilD'] == '' and $soal['fileD'] == '') { ?>
+      <?php
                                     $ax = ($jawab['jawabx'] == 'A') ? 'checked' : '';
                                     $bx = ($jawab['jawabx'] == 'B') ? 'checked' : '';
                                     $cx = ($jawab['jawabx'] == 'C') ? 'checked' : '';
@@ -136,62 +136,74 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                         $ex = ($jawab['jawabx'] == 'E') ? 'checked' : '';
                                     endif;
                                     ?>
-                                    <table class='table'>
-                                        <tr>
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='A' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'A','A',1,<?= $ac ?>)" <?= $ax ?> />
-                                                <label class='button-label' for='A'>
-                                                    <h1>A</h1>
-                                                </label>
-                                            </td>
+      <table class='table'>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='A'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'A','A',1,<?= $ac ?>)"
+              <?= $ax ?> />
+            <label class='button-label' for='A'>
+              <h1>A</h1>
+            </label>
+          </td>
 
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='C' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'C','C',1,<?= $ac ?>)" <?= $cx ?> />
-                                                <label class='button-label' for='C'>
-                                                    <h1>C</h1>
-                                                </label>
-                                            </td>
-                                            <?php if ($mapel[0]['opsi'] == 5) { ?>
-                                                <td>
-                                                    <input class='hidden radio-label' type='radio' name='jawab' id='E' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'E','E',1,<?= $ac ?>)" <?= $ex ?> />
-                                                    <label class='button-label' for='E'>
-                                                        <h1>E</h1>
-                                                    </label>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='C'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'C','C',1,<?= $ac ?>)"
+              <?= $cx ?> />
+            <label class='button-label' for='C'>
+              <h1>C</h1>
+            </label>
+          </td>
+          <?php if ($mapel[0]['opsi'] == 5) { ?>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='E'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'E','E',1,<?= $ac ?>)"
+              <?= $ex ?> />
+            <label class='button-label' for='E'>
+              <h1>E</h1>
+            </label>
 
-                                                </td>
-                                            <?php } ?>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='B' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'B','B',1,<?= $ac ?>)" <?= $bx ?> />
-                                                <label class='button-label' for='B'>
-                                                    <h1>B</h1>
-                                                </label>
-                                            </td>
-                                            <?php if ($mapel[0]['opsi'] <> 3) { ?>
-                                                <td>
-                                                    <input class='hidden radio-label' type='radio' name='jawab' id='D' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'D','D',1,<?= $ac ?>)" <?= $dx ?> />
-                                                    <label class='button-label' for='D'>
-                                                        <h1>D</h1>
-                                                    </label>
-                                                </td>
-                                            <?php } ?>
-                                        </tr>
-                                    </table>
-                                <?php } else { ?>
-                                    <table width='100%' class='table table-striped table-hover'>
-                                        <tr>
-                                            <!-- Opsi A -->
-                                            <td width='60'>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='A' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil1 ?>','A',1,<?= $ac ?>)" <?= $a ?> />
-                                                <label class='button-label' for='A'>
-                                                    <h1>A</h1>
-                                                </label>
-                                            </td>
-                                            <td style='vertical-align:middle;'>
-                                                <span class='soal'><?= $soal[$pilAA] ?></span>
-                                                <?php if ($soal[$fileAA] <> '') : ?>
-                                                    <?php
+          </td>
+          <?php } ?>
+        </tr>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='B'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'B','B',1,<?= $ac ?>)"
+              <?= $bx ?> />
+            <label class='button-label' for='B'>
+              <h1>B</h1>
+            </label>
+          </td>
+          <?php if ($mapel[0]['opsi'] <> 3) { ?>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='D'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'D','D',1,<?= $ac ?>)"
+              <?= $dx ?> />
+            <label class='button-label' for='D'>
+              <h1>D</h1>
+            </label>
+          </td>
+          <?php } ?>
+        </tr>
+      </table>
+      <?php } else { ?>
+      <table width='100%' class='table table-striped table-hover'>
+        <tr>
+          <!-- Opsi A -->
+          <td width='60'>
+            <input class='hidden radio-label' type='radio' name='jawab' id='A'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil1 ?>','A',1,<?= $ac ?>)"
+              <?= $a ?> />
+            <label class='button-label' for='A'>
+              <h1>A</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal[$pilAA] ?></span>
+            <?php if ($soal[$fileAA] <> '') : ?>
+            <?php
                                                     $ext = explode(".", $soal[$fileAA]);
                                                     $ext = end($ext);
                                                     if (in_array($ext, $image)) :
@@ -202,20 +214,22 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                         echo "File tidak didukung!";
                                                     endif;
                                                     ?>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <!-- Opsi B -->
-                                            <td width='60'>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='B' onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil2 ?>','B',1, <?= $ac ?>)" <?= $b ?> />
-                                                <label class='button-label' for='B'>
-                                                    <h1>B</h1>
-                                                </label>
-                                            </td>
-                                            <td style='vertical-align:middle;'>
-                                                <span class='soal'><?= $soal[$pilBB] ?></span>
-                                                <?php
+            <?php endif; ?>
+          </td>
+        </tr>
+        <tr>
+          <!-- Opsi B -->
+          <td width='60'>
+            <input class='hidden radio-label' type='radio' name='jawab' id='B'
+              onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil2 ?>','B',1, <?= $ac ?>)"
+              <?= $b ?> />
+            <label class='button-label' for='B'>
+              <h1>B</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal[$pilBB] ?></span>
+            <?php
                                                 if ($soal[$fileBB] <> '') {
                                                     $ext = explode(".", $soal[$fileBB]);
                                                     $ext = end($ext);
@@ -228,19 +242,21 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                     endif;
                                                 }
                                                 ?>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <!-- Opsi C -->
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='C' onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>, <?= $soal['id_soal'] ?>,'<?= $pil3 ?>','C',1,<?= $ac ?>)" <?= $c ?> />
-                                                <label class='button-label' for='C'>
-                                                    <h1>C</h1>
-                                                </label>
-                                            </td>
-                                            <td style='vertical-align:middle;'>
-                                                <span class='soal'><?= $soal[$pilCC] ?></span>
-                                                <?php
+          </td>
+        </tr>
+        <tr>
+          <!-- Opsi C -->
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='C'
+              onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>, <?= $soal['id_soal'] ?>,'<?= $pil3 ?>','C',1,<?= $ac ?>)"
+              <?= $c ?> />
+            <label class='button-label' for='C'>
+              <h1>C</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal[$pilCC] ?></span>
+            <?php
                                                 if ($soal[$fileCC] <> '') {
                                                     $ext = explode(".", $soal[$fileCC]);
                                                     $ext = end($ext);
@@ -253,19 +269,21 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                     }
                                                 }
                                                 ?>
-                                            </td>
-                                        </tr>
-                                        <?php if ($mapel[0]['opsi'] <> 3) : ?>
-                                            <tr>
-                                                <td>
-                                                    <input class='hidden radio-label' type='radio' name='jawab' id='D' onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil4 ?>','D',1,<?= $ac ?>)" <?= $d ?> />
-                                                    <label class='button-label' for='D'>
-                                                        <h1>D</h1>
-                                                    </label>
-                                                </td>
-                                                <td style='vertical-align:middle;'>
-                                                    <span class='soal'><?= $soal[$pilDD] ?></span>
-                                                    <?php
+          </td>
+        </tr>
+        <?php if ($mapel[0]['opsi'] <> 3) : ?>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='D'
+              onclick="jawabsoal(<?= $id_mapel ?>, <?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil4 ?>','D',1,<?= $ac ?>)"
+              <?= $d ?> />
+            <label class='button-label' for='D'>
+              <h1>D</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal[$pilDD] ?></span>
+            <?php
                                                     if ($soal[$fileDD] <> '') {
                                                         $ext = explode(".", $soal[$fileDD]);
                                                         $ext = end($ext);
@@ -278,20 +296,22 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                         }
                                                     }
                                                     ?>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                        <?php if ($mapel[0]['opsi'] == 5) : ?>
-                                            <tr>
-                                                <td>
-                                                    <input class='hidden radio-label' type='radio' name='jawab' id='E' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil5 ?>','E',1,<?= $ac ?>)" <?= $e ?> />
-                                                    <label class='button-label' for='E'>
-                                                        <h1>E</h1>
-                                                    </label>
-                                                </td>
-                                                <td style='vertical-align:middle;'>
-                                                    <span class='soal'><?= $soal[$pilEE] ?></span>
-                                                    <?php
+          </td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($mapel[0]['opsi'] == 5) : ?>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='E'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'<?= $pil5 ?>','E',1,<?= $ac ?>)"
+              <?= $e ?> />
+            <label class='button-label' for='E'>
+              <h1>E</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal[$pilEE] ?></span>
+            <?php
                                                     if ($soal[$fileEE] <> '') {
                                                         $ext = explode(".", $soal[$fileEE]);
                                                         $ext = end($ext);
@@ -303,13 +323,13 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                             echo "File tidak didukung!";
                                                         }
                                                     } ?>
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </table>
-                                <?php } ?>
-                            <?php else : ?>
-                                <?php
+          </td>
+        </tr>
+        <?php endif; ?>
+      </table>
+      <?php } ?>
+      <?php else : ?>
+      <?php
 
                                 $a = ($jawab['jawabx'] == 'A') ? 'checked' : '';
                                 $b = ($jawab['jawabx'] == 'B') ? 'checked' : '';
@@ -322,17 +342,19 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                     $e = ($jawab['jawabx'] == 'E') ? 'checked' : '';
                                 }
                                 ?>
-                                <table width='100%' class='table table-striped table-hover'>
-                                    <tr>
-                                        <td width='60'>
-                                            <input class='hidden radio-label' type='radio' name='jawab' id='A' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'A','A',1,<?= $ac ?>)" <?= $a ?> />
-                                            <label class='button-label' for='A'>
-                                                <h1>A</h1>
-                                            </label>
-                                        </td>
-                                        <td style='vertical-align:middle;'>
-                                            <span class='soal'><?= $soal['pilA'] ?></span>
-                                            <?php
+      <table width='100%' class='table table-striped table-hover'>
+        <tr>
+          <td width='60'>
+            <input class='hidden radio-label' type='radio' name='jawab' id='A'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'A','A',1,<?= $ac ?>)"
+              <?= $a ?> />
+            <label class='button-label' for='A'>
+              <h1>A</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal['pilA'] ?></span>
+            <?php
                                             if ($soal['fileA'] <> '') {
                                                 $ext = explode(".", $soal['fileA']);
                                                 $ext = end($ext);
@@ -345,18 +367,20 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                 }
                                             }
                                             ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <input class='hidden radio-label' type='radio' name='jawab' id='B' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'B','B',1,<?= $ac ?>)" <?= $b ?> />
-                                            <label class='button-label' for='B'>
-                                                <h1>B</h1>
-                                            </label>
-                                        </td>
-                                        <td style='vertical-align:middle;'>
-                                            <span class='soal'><?= $soal['pilB'] ?></span>
-                                            <?php
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='B'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'B','B',1,<?= $ac ?>)"
+              <?= $b ?> />
+            <label class='button-label' for='B'>
+              <h1>B</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal['pilB'] ?></span>
+            <?php
                                             if ($soal['fileB'] <> '') {
                                                 $ext = explode(".", $soal['fileB']);
                                                 $ext = end($ext);
@@ -369,19 +393,21 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                 }
                                             }
                                             ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <input class='hidden radio-label' type='radio' name='jawab' id='C' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'C','C',1,<?= $ac ?>)" <?= $c ?> />
-                                            <label class='button-label' for='C'>
-                                                <h1>C</h1>
-                                            </label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='C'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'C','C',1,<?= $ac ?>)"
+              <?= $c ?> />
+            <label class='button-label' for='C'>
+              <h1>C</h1>
+            </label>
 
-                                        </td>
-                                        <td style='vertical-align:middle;'>
-                                            <span class='soal'><?= $soal['pilC'] ?></span>
-                                            <?php
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal['pilC'] ?></span>
+            <?php
                                             if ($soal['fileC'] <> '') {
                                                 $ext = explode(".", $soal['fileC']);
                                                 $ext = end($ext);
@@ -394,19 +420,21 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                 }
                                             }
                                             ?>
-                                        </td>
-                                    </tr>
-                                    <?php if ($mapel[0]['opsi'] <> 3) { ?>
-                                        <tr>
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='D' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'D','D',1,<?= $ac ?>)" <?= $d ?> />
-                                                <label class='button-label' for='D'>
-                                                    <h1>D</h1>
-                                                </label>
-                                            </td>
-                                            <td style='vertical-align:middle;'>
-                                                <span class='soal'><?= $soal['pilD'] ?></span>
-                                                <?php
+          </td>
+        </tr>
+        <?php if ($mapel[0]['opsi'] <> 3) { ?>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='D'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'D','D',1,<?= $ac ?>)"
+              <?= $d ?> />
+            <label class='button-label' for='D'>
+              <h1>D</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal['pilD'] ?></span>
+            <?php
                                                 if ($soal['fileD'] <> '') {
                                                     $ext = explode(".", $soal['fileD']);
                                                     $ext = end($ext);
@@ -419,20 +447,22 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                     }
                                                 }
                                                 ?>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
-                                    <?php if ($mapel[0]['opsi'] == 5) { ?>
-                                        <tr>
-                                            <td>
-                                                <input class='hidden radio-label' type='radio' name='jawab' id='E' onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'E','E',1,<?= $ac ?>)" <?= $e ?> />
-                                                <label class='button-label' for='E'>
-                                                    <h1>E</h1>
-                                                </label>
-                                            </td>
-                                            <td style='vertical-align:middle;'>
-                                                <span class='soal'><?= $soal['pilE'] ?></span>
-                                                <?php
+          </td>
+        </tr>
+        <?php } ?>
+        <?php if ($mapel[0]['opsi'] == 5) { ?>
+        <tr>
+          <td>
+            <input class='hidden radio-label' type='radio' name='jawab' id='E'
+              onclick="jawabsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,'E','E',1,<?= $ac ?>)"
+              <?= $e ?> />
+            <label class='button-label' for='E'>
+              <h1>E</h1>
+            </label>
+          </td>
+          <td style='vertical-align:middle;'>
+            <span class='soal'><?= $soal['pilE'] ?></span>
+            <?php
                                                 if ($soal['fileE'] <> '') {
 
                                                     $ext = explode(".", $soal['fileE']);
@@ -446,54 +476,61 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                                     }
                                                 }
                                                 ?>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
-                                </table>
-                            <?php endif; ?>
-                        </div>
-                    <?php } ?>
-                    <?php if ($soal['jenis'] == 2) { ?>
-                        <div class='col-md-12'>
-                            <textarea id='jawabesai' name='textjawab' style='height:200px' class='form-control' onchange="jawabesai(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,2)"><?= $jawab['esai'] ?></textarea>
-                            <br><br>
-                        </div>
-                    <?php } ?>
-                </div>
-            </div>
+          </td>
+        </tr>
+        <?php } ?>
+      </table>
+      <?php endif; ?>
+    </div>
+    <?php } ?>
+    <?php if ($soal['jenis'] == 2) { ?>
+    <div class='col-md-12'>
+      <textarea id='jawabesai' name='textjawab' style='height:200px' class='form-control'
+        onchange="jawabesai(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>,2)"><?= $jawab['esai'] ?></textarea>
+      <br><br>
+    </div>
+    <?php } ?>
+  </div>
+</div>
 
-            <div class='box-footer navbar-fixed-bottom'>
-                <table width='100%'>
-                    <tr>
-                        <td style="text-align:center">
-                            <button id='move-prev' class='btn  btn-primary' onclick="loadsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $no_prev ?>)"><i class='fas fa-chevron-circle-left'></i> <span class='hidden-xs'>Soal Sebelumnya</span></button>
-                            <i class='fa fa-spin fa-spinner' id='spin-prev' style='display:none;'></i>
-                        </td>
-                        <?php if ($soal['jenis'] == 1) { ?>
-                            <td style="text-align:center">
+<div class='box-footer navbar-fixed-bottom'>
+  <table width='100%'>
+    <tr>
+      <td style="text-align:center">
+        <button id='move-prev' class='btn  btn-primary'
+          onclick="loadsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $no_prev ?>)"><i
+            class='fas fa-chevron-circle-left'></i> <span class='hidden-xs'>Soal Sebelumnya</span></button>
+        <i class='fa fa-spin fa-spinner' id='spin-prev' style='display:none;'></i>
+      </td>
+      <?php if ($soal['jenis'] == 1) { ?>
+      <td style="text-align:center">
 
-                                <div id='load-ragu'>
-                                    <a href='#' class='btn btn-warning'><input type='checkbox' onclick="radaragu(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>, <?= $ac ?>)" <?= $ragu = ($jawab['ragu'] == 1) ? 'checked' : ''; ?> /> Ragu <span class='hidden-xs'>- Ragu</span></a>
-                                </div>
+        <div id='load-ragu'>
+          <a href='#' class='btn btn-warning'><input type='checkbox'
+              onclick="radaragu(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $soal['id_soal'] ?>, <?= $ac ?>)"
+              <?= $ragu = ($jawab['ragu'] == 1) ? 'checked' : ''; ?> /> Ragu <span class='hidden-xs'>- Ragu</span></a>
+        </div>
 
-                            </td>
-                        <?php } ?>
-                        <td style="text-align:center">
-                            <?php
+      </td>
+      <?php } ?>
+      <td style="text-align:center">
+        <?php
                             $jumsoalpg = $mapel[0]['tampil_pg'] + $mapel[0]['tampil_esai'];
 							$jumsoalesai = $mapel[0]['tampil_esai'];
                             $cekno_soal = $no_soal + 1;
                             ?>
-                            <?php if (($no_soal >= 0) && ($cekno_soal < $jumsoalpg)) { ?>
+        <?php if (($no_soal >= 0) && ($cekno_soal < $jumsoalpg)) { ?>
 
-                                <i class='fa fa-spin fa-spinner' id='spin-next' style='display:none;'></i>
-                                <button id='move-next' class='btn  btn-primary' onclick="loadsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $no_next ?>)"><span class='hidden-xs'>Soal Selanjutnya </span><i class='fas fa-chevron-circle-right'></i></button>
+        <i class='fa fa-spin fa-spinner' id='spin-next' style='display:none;'></i>
+        <button id='move-next' class='btn  btn-primary'
+          onclick="loadsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $no_next ?>)"><span class='hidden-xs'>Soal Selanjutnya
+          </span><i class='fas fa-chevron-circle-right'></i></button>
 
-                            <?php } elseif (($no_soal >= 0) && ($cekno_soal == $jumsoalpg)) { ?>
+        <?php } elseif (($no_soal >= 0) && ($cekno_soal == $jumsoalpg)) { ?>
 
-                                <input type='submit' name='done' id='selesai-submit' style='display:none;' />
-                                <button class='done-btn btn btn-danger' style='width:150px;' id="btnselesai" disabled>
-                                    <?php
+        <input type='submit' name='done' id='selesai-submit' style='display:none;' />
+        <button class='done-btn btn btn-danger' style='width:150px;' id="btnselesai" disabled>
+          <?php if(isset($_POST['waktuselesai'])):
                                     $waktuselesai = $_POST['waktuselesai'];
                                     $sisawaktu = explode(':', $_POST['sisawaktu']);
                                     $sisajam = $sisawaktu[0];
@@ -513,114 +550,113 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                     $mnt = floor(($sisawaktuselesai % 3600) / 60);
                                     $jam = floor(($sisawaktuselesai % 86400) / 3600);
                                     ?>
-                                    <i class="fas fa-stopwatch"></i> 
-                                    <span id="sisajam"><?= $jam ?></span>:<span id="sisamenit"><?= $mnt ?></span>:<span id="sisadetik"><?= $dtk ?></span>
-                                </button>
+          <i class="fas fa-stopwatch"></i>
+          <span id="sisajam"><?= $jam ?></span>:<span id="sisamenit"><?= $mnt ?></span>:<span
+            id="sisadetik"><?= $dtk ?></span>
+        <?php endif; ?>
+        </button>
 
-                            <?php } ?>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-    <?php
+        <?php } ?>
+      </td>
+    </tr>
+  </table>
+</div>
+<?php
         }
     }
     ?>
-    <script>
-        $(document).ready(function() {
-            $('#zoom').zoom();
-            $('#zoom1').zoom();
-            $('.lup').zoom();
-            $('.soal img')
-                .wrap('<span style="display:inline-block"></span>')
-                .css('display', 'block')
-                .parent()
-                .zoom();
+<script>
+$(document).ready(function() {
+  $('#zoom').zoom();
+  $('#zoom1').zoom();
+  $('.lup').zoom();
+  $('.soal img')
+    .wrap('<span style="display:inline-block"></span>')
+    .css('display', 'block')
+    .parent()
+    .zoom();
 
-            <?php if ($_POST['sisawaktu']): ?>
-                var waktuberjalan = <?= $waktuberjalan ?>;
-                var waktuselesai = <?php echo $waktuselesai * 60; ?>;
+  <?php if (isset($_POST['sisawaktu'])) : ?>
+  var waktuberjalan = <?= $waktuberjalan ?>;
+  var waktuselesai = <?php echo $waktuselesai * 60; ?>;
 
-                var jam = $('#sisajam').html();
-                var menit = $('#sisamenit').html();
-                var detik = $('#sisadetik').html();
+  var jam = $('#sisajam').html();
+  var menit = $('#sisamenit').html();
+  var detik = $('#sisadetik').html();
 
-                function btnselesai() {
-                    setTimeout(btnselesai, 1000);
+  function btnselesai() {
+    setTimeout(btnselesai, 1000);
 
-                    waktuberjalan++;
-                    if (waktuberjalan >= waktuselesai) {
-                        $('#btnselesai').removeAttr("disabled");
-                        $('#btnselesai').html('<i class="fas fa-flag-checkered"></i> <span class="hidden-xs">TEST </span>SELESAI');
-                    } else {
-                        $('#sisajam').html(jam);
-                        $('#sisamenit').html(menit);
-                        $('#sisadetik').html(detik);
-                    }
-                    
-                    detik--;
-                    if (detik < 0) {
-                        detik = 59;
-                        menit--;
-                        if (menit < 0) {
-                            menit = 59;
-                            jam--;
-                            if (jam < 0) {
-                                jam = 0;
-                                menit = 0;
-                                detik = 0;
-                            }
-                        }
-                    }
-                }
-                btnselesai();
-            <?php endif; ?>
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            Mousetrap.bind('enter', function() {
-                loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_next ?>);
-            });
+    waktuberjalan++;
+    if (waktuberjalan >= waktuselesai) {
+      $('#btnselesai').removeAttr("disabled");
+      $('#btnselesai').html('<i class="fas fa-flag-checkered"></i> <span class="hidden-xs">TEST </span>SELESAI');
+    } else {
+      $('#sisajam').html(jam);
+      $('#sisamenit').html(menit);
+      $('#sisadetik').html(detik);
+    }
 
-            Mousetrap.bind('right', function() {
-                loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_next ?>);
-            });
+    detik--;
+    if (detik < 0) {
+      detik = 59;
+      menit--;
+      if (menit < 0) {
+        menit = 59;
+        jam--;
+        if (jam < 0) {
+          jam = 0;
+          menit = 0;
+          detik = 0;
+        }
+      }
+    }
+  }
+  btnselesai();
+  <?php endif; ?>
+});
+</script>
+<script>
+  Mousetrap.bind('enter', function() {
+    loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_next ?>);
+  });
 
-            Mousetrap.bind('left', function() {
-                loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_prev  ?>);
-            });
+  Mousetrap.bind('right', function() {
+    loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_next ?>);
+  });
 
-            Mousetrap.bind('a', function() {
-                $('#A').click()
-            });
+  Mousetrap.bind('left', function() {
+    loadsoal(<?= $id_mapel . "," . $id_siswa . "," . $no_prev  ?>);
+  });
 
-            Mousetrap.bind('b', function() {
-                $('#B').click()
-            });
+  Mousetrap.bind('a', function() {
+    $('#A').click()
+  });
 
-            Mousetrap.bind('c', function() {
-                $('#C').click()
-            });
+  Mousetrap.bind('b', function() {
+    $('#B').click()
+  });
 
-            Mousetrap.bind('d', function() {
-                $('#D').click()
-            });
+  Mousetrap.bind('c', function() {
+    $('#C').click()
+  });
 
-            Mousetrap.bind('e', function() {
-                $('#E').click()
-            });
+  Mousetrap.bind('d', function() {
+    $('#D').click()
+  });
 
-            Mousetrap.bind('space', function() {
-                $('input[type=checkbox]').click()
-                radaragu(<?= $id_mapel . "," . $id_siswa . "," . $soal['id_soal'] ?>, <?= $ac ?>)
-            });
+  Mousetrap.bind('e', function() {
+    $('#E').click()
+  });
 
-        });
-    </script>
-    <script>
-        MathJax.Hub.Typeset()
-    </script>
+  Mousetrap.bind('space', function() {
+    $('input[type=checkbox]').click()
+    radaragu(<?= $id_mapel . "," . $id_siswa . "," . $soal['id_soal'] ?>, <?= $ac ?>)
+  });
+</script>
+<script>
+MathJax.Hub.Typeset()
+</script>
 <?php } ?>
 <?php
 if ($pg == 'jawab') {
