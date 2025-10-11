@@ -40,22 +40,31 @@ $sheet->getStyle('A1:A4')->applyFromArray([
 ]);
 
 $sheet->setCellValue('A6', 'Mata Pelajaran: ' . $mata_pelajaran['nama_mapel']);
-$sheet->setCellValue('A7', 'Jumlah Soal: ' . $mapel['jml_soal'] . ' PG');
+$sheet->setCellValue('A7', 'Jumlah Soal: ' . $mapel['jml_soal'] . ' PG / ' . $mapel['jml_esai'] . ' Esai');
 
 // Header Tabel
-$headers = ['No.', 'NIS', 'Nama', 'Kelas', 'Benar', 'Salah', 'Nilai'];
+$headers = ['No.', 'NIS', 'Nama', 'Kelas', 'Benar', 'Salah', 'Nilai', 'Nilai Esai'];
 $columnIndex = 'A';
 foreach ($headers as $header) {
     $sheet->setCellValue($columnIndex . '9', $header);
     $columnIndex++;
 }
 
-// Tambahkan kolom untuk jawaban dan atur lebarnya
+// Tambahkan kolom untuk jawaban PG dan atur lebarnya
 for ($i = 1; $i <= $mapel['jml_soal']; $i++) {
     $sheet->setCellValue($columnIndex . '9', 'S' . $i);
     $sheet->getColumnDimension($columnIndex)->setWidth(4.25);
     $columnIndex++;
 }
+
+// Tambahkan kolom untuk jawaban Esai
+for ($i = 1; $i <= $mapel['jml_esai']; $i++) {
+    $sheet->setCellValue($columnIndex . '9', 'E' . $i);
+    $sheet->getColumnDimension($columnIndex)->setWidth(20); // Beri lebar lebih untuk esai
+    $columnIndex++;
+}
+
+$sheet->getColumnDimension('C')->setAutoSize(true);
 
 // Atur gaya header tabel
 $sheet->getStyle('A9:' . $columnIndex . '9')->applyFromArray([
@@ -99,11 +108,13 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
         $sheet->setCellValue('E' . $row, $nilai['jml_benar']);
         $sheet->setCellValue('F' . $row, $nilai['jml_salah']);
         $sheet->setCellValue('G' . $row, round($nilai['skor'], 2));
+        $sheet->setCellValue('H' . $row, round($nilai['nilai_esai'], 2));
 
-        $jawaban = unserialize($nilai['jawaban']);
-        $column = 'H';
+        // Jawaban PG
+        $jawaban_pg = unserialize($nilai['jawaban']);
+        $column = 'I'; // Mulai dari kolom I untuk jawaban PG
 
-        foreach ($jawaban as $key => $value) {
+        foreach ($jawaban_pg as $key => $value) {
             $soal = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM soal WHERE id_soal = '$key'"));
             $warna = ($value == $soal['jawaban']) ? '00FF00' : (($value == 'X') ? 'FFEB3B' : 'F44336');
             $sheet->setCellValue($column . $row, $value);
@@ -114,8 +125,19 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
                 ->setARGB($warna);
             $column++;
         }
+
+        // Jawaban Esai
+        if ($mapel['jml_esai'] > 0 && !empty($nilai['jawaban_esai'])) {
+            $jawaban_esai = unserialize($nilai['jawaban_esai']);
+            foreach ($jawaban_esai as $key => $value) {
+                $sheet->setCellValue($column . $row, $value);
+                // Atur wrap text untuk jawaban esai yang panjang
+                $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true);
+                $column++;
+            }
+        }
     } else {
-        $sheet->setCellValue('E' . $row, 'Tidak mengikuti ujian');
+        $sheet->setCellValue('E' . $row, 'Tidak mengikuti ujian')->mergeCells('E' . $row . ':' . $columnIndex . $row);
     }
 
     // Terapkan border untuk baris saat ini
@@ -132,7 +154,7 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
 }
 
 // Menambahkan border ke seluruh tabel (termasuk header)
-$lastColumn = chr(ord('A') + ($mapel['jml_soal'] + 6)); // Hitung kolom terakhir (jumlah soal + kolom tetap)
+$lastColumn = chr(ord('A') + 7 + $mapel['jml_soal'] + $mapel['jml_esai']); // Hitung kolom terakhir (jumlah soal pg + jumlah soal esai + 8 kolom tetap - 1)
 $lastRow = $row - 1;
 
 $sheet->getStyle('A9:' . $lastColumn . $lastRow)->applyFromArray([
@@ -149,6 +171,13 @@ $sheet->getStyle('A10:' . $lastColumn . $lastRow)->applyFromArray([
     'alignment' => [
         'horizontal' => Alignment::HORIZONTAL_CENTER,
         'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+]);
+
+// Atur perataan kiri khusus untuk kolom Nama
+$sheet->getStyle('C10:C' . $lastRow)->applyFromArray([
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_LEFT,
     ],
 ]);
 
