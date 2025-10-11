@@ -88,6 +88,19 @@ $sheet->getStyle('A9:' . $columnIndex . '9')->applyFromArray([
     ],
 ]);
 
+// Ambil semua data soal dan kunci jawaban untuk ujian ini dalam satu query
+$soal_data = [];
+$query_soal = mysqli_query($koneksi, "SELECT id_soal, jawaban FROM soal WHERE id_mapel = '$id_mapel' ORDER BY id_soal ASC");
+if ($query_soal) {
+    $no_soal = 1;
+    while ($s = mysqli_fetch_assoc($query_soal)) {
+        $soal_data[(int)$s['id_soal']] = [
+            'no' => $no_soal++,
+            'jawaban' => $s['jawaban']
+        ];
+    }
+}
+
 // Fetch Data Siswa
 $siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas = '$id_kelas' ORDER BY nama ASC");
 if (!$siswaQ) {
@@ -112,29 +125,43 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
         $sheet->setCellValue('H' . $row, round($nilai['nilai_esai'], 2));
 
         // Jawaban PG
-        $jawaban_pg = unserialize($nilai['jawaban']);
-        $column = 'I'; // Mulai dari kolom I untuk jawaban PG
+        if (!empty($nilai['jawaban'])) {
+            $jawaban_pg = unserialize($nilai['jawaban']);
+            foreach ($jawaban_pg as $id_soal => $jawaban_siswa) {
+                if (isset($soal_data[$id_soal])) {
+                    $detail_soal = $soal_data[$id_soal];
+                    $nomor_soal_urut = $detail_soal['no'];
+                    $kunci_jawaban = $detail_soal['jawaban'];
 
-        foreach ($jawaban_pg as $key => $value) {
-            $soal = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM soal WHERE id_soal = '$key'"));
-            $warna = ($value == $soal['jawaban']) ? '00FF00' : (($value == 'X') ? 'FFEB3B' : 'F44336');
-            $sheet->setCellValue($column . $row, $value);
-            $sheet->getStyle($column . $row)
-                ->getFill()
-                ->setFillType(Fill::FILL_SOLID)
-                ->getStartColor()
-                ->setARGB($warna);
-            $column++;
+                    // Hitung kolom yang benar untuk soal ini (I adalah kolom ke-9)
+                    $col_index = 9 + $nomor_soal_urut - 1;
+                    $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col_index);
+                    
+                    $warna = ($jawaban_siswa == $kunci_jawaban) ? '00FF00' : (($jawaban_siswa == 'X') ? 'FFEB3B' : 'F44336');
+                    $sheet->setCellValue($column . $row, $jawaban_siswa);
+                    $sheet->getStyle($column . $row)
+                        ->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setARGB($warna);
+                }
+            }
         }
 
         // Jawaban Esai
         if ($mapel['jml_esai'] > 0 && !empty($nilai['jawaban_esai'])) {
             $jawaban_esai = unserialize($nilai['jawaban_esai']);
+            $i = 0;
+            // Kolom esai dimulai setelah semua kolom PG (A-H adalah 8 kolom)
+            $start_col_esai_index = 8 + $mapel['jml_soal'] + 1; 
+
             foreach ($jawaban_esai as $key => $value) {
-                $sheet->setCellValue($column . $row, $value);
-                // Atur wrap text untuk jawaban esai yang panjang
-                $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true);
-                $column++;
+                $col_index = $start_col_esai_index + $i;
+                $column_letter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col_index);
+                
+                $sheet->setCellValue($column_letter . $row, $value);
+                $sheet->getStyle($column_letter . $row)->getAlignment()->setWrapText(true);
+                $i++;
             }
         }
     } else {
