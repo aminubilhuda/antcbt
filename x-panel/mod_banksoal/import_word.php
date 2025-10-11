@@ -124,12 +124,13 @@ if ($_POST) {
         $quesions = [];
 
         foreach ($expl as $ekey => $value) {
-            $cqno = str_replace(['Soal:', ')'], '', $explflag[$ekey]);
+            $cqno = preg_replace('/[^0-9]/', '', $explflag[$ekey]);
             $cqno = trim($cqno);
 
-            if ($cqno != ($ekey + 1)) {
-                throw new Exception("Format soal salah pada soal nomor " . ($ekey + 1) . " atau soal tidak ditemukan.");
-            }
+            // Validasi nomor urut soal dinonaktifkan untuk fleksibilitas
+            // if ($cqno != ($ekey + 1)) {
+            //     throw new Exception("Format soal salah pada soal nomor " . ($ekey + 1) . " atau soal tidak ditemukan.");
+            // }
 
             $quesions[$cqno] = array_filter(preg_split($option_split, $value));
             $jindex = count($quesions[$cqno]);
@@ -185,20 +186,26 @@ if ($_POST) {
             $quesions[$cqno] = $options;
         }
 
+        // Hitung jumlah soal PG sebelum update database
+        $jumlah_pg_diimpor = 0;
+        foreach ($quesions as $q) {
+            if (count($q) > 1) { // Logika yang sama untuk mendeteksi PG
+                $jumlah_pg_diimpor++;
+            }
+        }
+
         $stmt_mapel_jml = mysqli_prepare($koneksi, "SELECT jml_soal FROM mapel WHERE id_mapel = ?");
         mysqli_stmt_bind_param($stmt_mapel_jml, 'i', $id_mapel);
         mysqli_stmt_execute($stmt_mapel_jml);
         $mapel = mysqli_stmt_get_result($stmt_mapel_jml);
         mysqli_stmt_close($stmt_mapel_jml);
         
-        $jml_soal = mysqli_fetch_array($mapel)[0];
-        $jumlah_soal_diimpor = count($quesions);
+        $jml_soal_db = mysqli_fetch_array($mapel)[0];
 
-        if ($jumlah_soal_diimpor < $jml_soal) {
-            throw new Exception("Jumlah soal kurang. Jumlah soal di bank soal = " . $jml_soal . ". Soal diimport = " . $jumlah_soal_diimpor . ".");
-        } else if ($jumlah_soal_diimpor > $jml_soal) {
+        // Bandingkan dan update HANYA dengan jumlah soal PG
+        if ($jumlah_pg_diimpor != $jml_soal_db) {
             $stmt_update_mapel = mysqli_prepare($koneksi, "UPDATE mapel SET jml_soal = ? WHERE id_mapel = ?");
-            mysqli_stmt_bind_param($stmt_update_mapel, 'ii', $jumlah_soal_diimpor, $id_mapel);
+            mysqli_stmt_bind_param($stmt_update_mapel, 'ii', $jumlah_pg_diimpor, $id_mapel);
             mysqli_stmt_execute($stmt_update_mapel);
             mysqli_stmt_close($stmt_update_mapel);
         }
