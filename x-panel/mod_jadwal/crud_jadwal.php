@@ -77,7 +77,7 @@ if ($pg == 'tambah') {
         } else {
             $exec = insert($koneksi, 'ujian', $data);
             if ($exec) {
-                $output[] = $exec;
+                $output[] = 'OK';
             } else {
                 $output[] = mysqli_error($koneksi);
             }

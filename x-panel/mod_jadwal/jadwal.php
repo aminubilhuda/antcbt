@@ -104,7 +104,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                         </label>
                     </div>
                     <div class='modal-footer'>
-                        <button name='tambahjadwal' class='btn btn-sm btn-flat btn-success'><i class='fa fa-check'></i> Simpan Semua</button>
+                        <button type="submit" name='tambahjadwal' class='btn btn-sm btn-flat btn-success'><i class='fa fa-check'></i> Simpan Semua</button>
                     </div>
                 </form>
             </div>
@@ -537,11 +537,41 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                 type: 'POST',
                 url: 'mod_jadwal/crud_jadwal.php?pg=tambah',
                 data: $(this).serialize(),
-                dataType: 'json',
+                success: function(response) {
+                    // Handle any PHP notices/warnings that might be prepended to the JSON
+                    var jsonResponse;
+                    try {
+                        // Try to extract JSON from the response if there are notices
+                        var jsonStart = response.indexOf('[');
+                        if (jsonStart >= 0) {
+                            jsonResponse = JSON.parse(response.substring(jsonStart));
+                        } else {
+                            jsonResponse = JSON.parse(response);
+                        }
+                    } catch (e) {
+                        console.log('Response:', response);
+                        iziToast.error({
+                            title: 'Error!',
+                            message: 'Format response tidak valid',
+                            position: 'topRight'
+                        });
+                        return;
+                    }
 
-                success: function(data) {
-                    $.each(data, function(k, v) {
-                        if (v == 'OK') {
+                    if (Array.isArray(jsonResponse)) {
+                        var hasError = false;
+                        jsonResponse.forEach(function(msg) {
+                            if (msg !== 'OK') {
+                                hasError = true;
+                                iziToast.error({
+                                    title: 'Gagal!',
+                                    message: msg,
+                                    position: 'topRight'
+                                });
+                            }
+                        });
+                        
+                        if (!hasError) {
                             iziToast.success({
                                 title: 'Mantap!',
                                 message: 'data berhasil disimpan',
@@ -550,13 +580,15 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                             setTimeout(function() {
                                 window.location.reload();
                             }, 2000);
-                        } else {
-                            iziToast.error({
-                                title: 'Maaf!',
-                                message: v,
-                                position: 'topRight'
-                            });
                         }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error:', xhr.responseText);
+                    iziToast.error({
+                        title: 'Error!',
+                        message: 'Gagal menyimpan data',
+                        position: 'topRight'
                     });
                 }
             });

@@ -481,7 +481,7 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                         <td style="text-align:center">
                             <?php
                             $jumsoalpg = $mapel[0]['tampil_pg'] + $mapel[0]['tampil_esai'];
-
+							$jumsoalesai = $mapel[0]['tampil_esai'];
                             $cekno_soal = $no_soal + 1;
                             ?>
                             <?php if (($no_soal >= 0) && ($cekno_soal < $jumsoalpg)) { ?>
@@ -489,7 +489,7 @@ $image = array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'JPG', 'JPEG', 'PNG', 'GIF', 
                                 <i class='fa fa-spin fa-spinner' id='spin-next' style='display:none;'></i>
                                 <button id='move-next' class='btn  btn-primary' onclick="loadsoal(<?= $id_mapel ?>,<?= $id_siswa ?>,<?= $no_next ?>)"><span class='hidden-xs'>Soal Selanjutnya </span><i class='fas fa-chevron-circle-right'></i></button>
 
-                            <?php } elseif (($no_soal >= 0) && ($cekno_soal = $jumsoalpg) && ($jumsoalesai == 0)) { ?>
+                            <?php } elseif (($no_soal >= 0) && ($cekno_soal == $jumsoalpg)) { ?>
 
                                 <input type='submit' name='done' id='selesai-submit' style='display:none;' />
                                 <button class='done-btn btn btn-danger' style='width:150px;' id="btnselesai" disabled>
