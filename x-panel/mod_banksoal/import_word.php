@@ -43,7 +43,7 @@ if ($_POST) {
 
         // 3. Regex yang lebih fleksibel
         $question_split = "/Soal\s*:\s*[0-9]+\)/i";
-        $option_split   = "/\s*[A-E][:.]\s*/";
+        $option_split   = "/[A-E]:/";
         $correct_split  = "/Kunci\s*:/i";
         $audio_split    = "/Audio\s*:/i";
 

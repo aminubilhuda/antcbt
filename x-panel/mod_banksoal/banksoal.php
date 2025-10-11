@@ -963,7 +963,11 @@ if ($ac == '') :
                                                             }
                                                         endif;
                                                         ?>
-                                                        <?= $soal['soal']; ?>
+                                
+                                                        <?php
+                                                        $v_soal = str_replace('<img src="../../files','<img src="../files',$soal['soal']);
+                                                        echo $v_soal;
+                                                        ?>
                                                         <?php
                                                         if ($soal['file1'] <> '') :
                                                             $audio = array('mp3', 'wav', 'ogg', 'MP3', 'WAV', 'OGG');
