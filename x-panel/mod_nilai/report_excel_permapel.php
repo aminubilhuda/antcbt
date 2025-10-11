@@ -39,7 +39,8 @@ $sheet->getStyle('A1:A4')->applyFromArray([
     ],
 ]);
 
-$sheet->setCellValue('A6', 'Mata Pelajaran: ' . $mata_pelajaran['nama_mapel']);
+$nama_mapel_display = !empty($mata_pelajaran['nama_mapel']) ? $mata_pelajaran['nama_mapel'] : $mapel['nama'];
+$sheet->setCellValue('A6', 'Mata Pelajaran: ' . $nama_mapel_display);
 $sheet->setCellValue('A7', 'Jumlah Soal: ' . $mapel['jml_soal'] . ' PG / ' . $mapel['jml_esai'] . ' Esai');
 
 // Header Tabel
