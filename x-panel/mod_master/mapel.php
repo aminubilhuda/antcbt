@@ -1,20 +1,44 @@
 <?php
 $pesan = '';
+$info = '';
 if (isset($_POST['simpanmapel'])) {
-    $kode = str_replace(' ', '', $_POST['kodemapel']);
-    $nama = addslashes($_POST['namamapel']);
-    $cek = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM mata_pelajaran WHERE kode_mapel='$kode'"));
-    if ($cek == 0) {
-        $exec = mysqli_query($koneksi, "INSERT INTO mata_pelajaran (kode_mapel,nama_mapel)value('$kode','$nama')");
-        $pesan = "<div class='alert alert-success alert-dismissible'>
-    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-    <i class='icon fa fa-info'></i>
-    Data Berhasil ditambahkan ..</div>";
-    } else {
+    $kode = trim(str_replace(' ', '', $_POST['kodemapel']));
+    $nama = trim($_POST['namamapel']);
+    if ($kode == '' or $nama == '') {
         $pesan = "<div class='alert alert-warning alert-dismissible'>
     <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
     <i class='icon fa fa-info'></i>
+    Kode dan Nama Pelajaran wajib diisi !</div>";
+    } else {
+        $stmt_cek = mysqli_prepare($koneksi, "SELECT kode_mapel FROM mata_pelajaran WHERE kode_mapel = ?");
+        mysqli_stmt_bind_param($stmt_cek, 's', $kode);
+        mysqli_stmt_execute($stmt_cek);
+        mysqli_stmt_store_result($stmt_cek);
+        $cek = mysqli_stmt_num_rows($stmt_cek);
+        mysqli_stmt_close($stmt_cek);
+        if ($cek == 0) {
+            $stmt_ins = mysqli_prepare($koneksi, "INSERT INTO mata_pelajaran (kode_mapel, nama_mapel, mapel_id) VALUES (?, ?, 0)");
+            mysqli_stmt_bind_param($stmt_ins, 'ss', $kode, $nama);
+            $exec = mysqli_stmt_execute($stmt_ins);
+            $error = mysqli_stmt_error($stmt_ins);
+            mysqli_stmt_close($stmt_ins);
+            if ($exec) {
+                $pesan = "<div class='alert alert-success alert-dismissible'>
+    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
+    <i class='icon fa fa-info'></i>
+    Data Berhasil ditambahkan ..</div>";
+            } else {
+                $pesan = "<div class='alert alert-danger alert-dismissible'>
+    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
+    <i class='icon fa fa-warning'></i>
+    Gagal menyimpan data: " . htmlspecialchars($error) . "</div>";
+            }
+        } else {
+            $pesan = "<div class='alert alert-warning alert-dismissible'>
+    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
+    <i class='icon fa fa-info'></i>
     Maaf Kode Mapel Sudah ada !</div>";
+        }
     }
 }
 if (isset($_POST['importmapel'])) {
@@ -28,28 +52,54 @@ if (isset($_POST['importmapel'])) {
         $data = new Spreadsheet_Excel_Reader($temp);
         $hasildata = $data->rowcount($sheet_index = 0);
         $sukses = $gagal = 0;
+        $detail_gagal = [];
+        $stmt_cek = mysqli_prepare($koneksi, "SELECT kode_mapel FROM mata_pelajaran WHERE kode_mapel = ?");
+        $stmt_ins = mysqli_prepare($koneksi, "INSERT INTO mata_pelajaran (kode_mapel, nama_mapel, mapel_id) VALUES (?, ?, 0)");
         for ($i = 2; $i <= $hasildata; $i++) {
-            $kode = addslashes($data->val($i, 2));
-            $nama = addslashes($data->val($i, 3));
-            $kode = str_replace(' ', '', $kode);
-            $nama = addslashes($nama);
-            $cek = mysqli_num_rows(mysqli_query($koneksi, "select * from mata_pelajaran where kode_mapel='$kode'"));
-            if ($kode <> '' and $nama <> '') {
-                if ($cek == 0) {
-                    $exec = mysqli_query($koneksi, "INSERT INTO mata_pelajaran (kode_mapel,nama_mapel) VALUES ('$kode','$nama')");
-                    ($exec) ? $sukses++ : $gagal++;
-                }
+            $kode = trim(str_replace(' ', '', $data->val($i, 2)));
+            $nama = trim($data->val($i, 3));
+            if ($kode == '' or $nama == '') {
+                $gagal++;
+                $detail_gagal[] = "Baris $i: kode/nama kosong";
+                continue;
+            }
+            mysqli_stmt_bind_param($stmt_cek, 's', $kode);
+            mysqli_stmt_execute($stmt_cek);
+            mysqli_stmt_store_result($stmt_cek);
+            $cek = mysqli_stmt_num_rows($stmt_cek);
+            if ($cek > 0) {
+                $gagal++;
+                $detail_gagal[] = "Baris $i: kode " . htmlspecialchars($kode) . " sudah ada (duplikat)";
+                continue;
+            }
+            mysqli_stmt_bind_param($stmt_ins, 'ss', $kode, $nama);
+            if (mysqli_stmt_execute($stmt_ins)) {
+                $sukses++;
             } else {
                 $gagal++;
+                $detail_gagal[] = "Baris $i (" . htmlspecialchars($kode) . "): gagal disimpan - " . mysqli_stmt_error($stmt_ins);
             }
         }
+        mysqli_stmt_close($stmt_cek);
+        mysqli_stmt_close($stmt_ins);
         $total = $hasildata - 1;
         $info = info("Berhasil: $sukses | Gagal: $gagal | Dari: $total", 'OK');
+        if ($detail_gagal) {
+            $tampil = array_slice($detail_gagal, 0, 50);
+            $info .= "<ul>";
+            foreach ($tampil as $d) {
+                $info .= "<li>$d</li>";
+            }
+            $info .= "</ul>";
+            if (count($detail_gagal) > 50) {
+                $info .= "<p>...dan " . (count($detail_gagal) - 50) . " baris lainnya</p>";
+            }
+        }
     }
 }
 ?>
 <div class='row'>
-    <div class='col-md-12'><?= $pesan ?></div>
+    <div class='col-md-12'><?= $pesan ?><?= $info ?></div>
     <div class='col-md-12'>
         <div class='box box-solid'>
             <div class='box-header with-border'>

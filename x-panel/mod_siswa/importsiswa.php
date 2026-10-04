@@ -45,7 +45,7 @@ if ($ext <> 'xls') {
 		$qkelas = mysqli_query($koneksi, "SELECT id_kelas FROM kelas WHERE id_kelas='$kelas'");
 		$cekkelas = mysqli_num_rows($qkelas);
 		if (!$cekkelas <> 0) {
-			$exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama)VALUES('$kelas','$level','$kelas')");
+			$exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama,id_raport)VALUES('$kelas','$level','$kelas',0)");
 		}
 		if ($setting['jenjang'] == 'SMK') {
 			$qpk = mysqli_query($koneksi, "SELECT id_pk FROM pk WHERE id_pk='$pk'");
@@ -70,7 +70,7 @@ if ($ext <> 'xls') {
 			$exec = mysqli_query($koneksi, "INSERT INTO sesi (kode_sesi,nama_sesi)VALUES('$sesi','$sesi')");
 		}
 
-		$exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto')");
+		$exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,no_meja) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','')");
 
 		($exec) ? $sukses++ : $gagal++;
 	}

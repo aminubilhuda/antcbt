@@ -7,7 +7,7 @@ if (isset($_POST['submit'])) :
     if ($cek > 0) {
         $info = info("Kelas dengan kode $idkelas sudah ada!", "NO");
     } else {
-        $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,nama,level) VALUES ('$idkelas','$nama','$level')");
+        $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,nama,level,id_raport) VALUES ('$idkelas','$nama','$level',0)");
         if (!$exec) :
             $info = info("Gagal menyimpan!", "NO");
         else :

@@ -45,7 +45,7 @@ if (isset($_FILES['file']['name'])) {
             $qkelas = mysqli_query($koneksi, "SELECT id_kelas FROM kelas WHERE id_kelas='$kelas'");
             $cekkelas = mysqli_num_rows($qkelas);
             if (!$cekkelas <> 0) {
-                $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama)VALUES('$kelas','$level','$kelas')");
+                $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama,id_raport)VALUES('$kelas','$level','$kelas',0)");
             }
             if ($setting['jenjang'] == 'SMK') {
                 $qpk = mysqli_query($koneksi, "SELECT id_pk FROM pk WHERE id_pk='$pk'");

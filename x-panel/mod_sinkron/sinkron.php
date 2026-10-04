@@ -23,13 +23,13 @@ if ($koneksi) {
                     $i = 0;
                     foreach ($r['siswa'] as $r) {
                         $sql = mysqli_query($koneksi, "insert into siswa
-                            (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,ruang,sesi,username,password,foto,server,agama) values 			
-                            ('$r[id_siswa]','$r[id_kelas]','$r[idpk]','$r[nis]','$r[no_peserta]','" . addslashes($r['nama']) . "','$r[level]','$r[ruang]','$r[sesi]','$r[username]','$r[password]','$r[foto]','$r[server]','$r[agama]')");
+                            (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,ruang,sesi,username,password,foto,server,agama,no_meja) values 			
+                            ('$r[id_siswa]','$r[id_kelas]','$r[idpk]','$r[nis]','$r[no_peserta]','" . addslashes($r['nama']) . "','$r[level]','$r[ruang]','$r[sesi]','$r[username]','$r[password]','$r[foto]','$r[server]','$r[agama]','$r[no_meja]')");
 
                         $qkelas = mysqli_query($koneksi, "SELECT id_kelas FROM kelas WHERE id_kelas='$r[id_kelas]'");
                         $cekkelas = mysqli_num_rows($qkelas);
                         if (!$cekkelas <> 0) {
-                            $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama)VALUES('$r[id_kelas]','$r[level]','$r[id_kelas]')");
+                            $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama,id_raport)VALUES('$r[id_kelas]','$r[level]','$r[id_kelas]',0)");
                         }
                         if ($setting['jenjang'] == 'SMK') {
 

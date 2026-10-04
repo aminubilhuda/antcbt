@@ -36,7 +36,7 @@ if (isset($_POST['importsiswa'])) :
                 $qkelas = mysqli_query($koneksi, "SELECT id_kelas FROM kelas WHERE id_kelas='$kelas'");
                 $cekkelas = mysqli_num_rows($qkelas);
                 if (!$cekkelas <> 0) {
-                    $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama)VALUES('$kelas','$level','$kelas')");
+                    $exec = mysqli_query($koneksi, "INSERT INTO kelas (id_kelas,level,nama,id_raport)VALUES('$kelas','$level','$kelas',0)");
                 }
 
                 $qpk = mysqli_query($koneksi, "SELECT id_pk FROM pk WHERE id_pk='$pk'");
@@ -66,7 +66,7 @@ if (isset($_POST['importsiswa'])) :
                     $exec = mysqli_query($koneksi, "INSERT INTO server (kode_server,nama_server,status)VALUES('$server','$server','aktif')");
                 }
 
-                $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama')");
+                $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama,no_meja) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama','')");
 
                 if ($exec) {
                     $sukses++;
