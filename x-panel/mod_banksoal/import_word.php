@@ -52,10 +52,34 @@ try {
         throw new Exception("ID Mapel tidak ditemukan.");
     }
 
+    if (!is_dir($target_dir)) {
+        @mkdir($target_dir, 0755, true);
+    }
+    if (!is_dir($target_dir)) {
+        throw new Exception("Folder tujuan tidak ditemukan: " . (realpath($target_dir) ?: $target_dir));
+    }
+    if (!is_writable($target_dir)) {
+        $pemilik = @fileowner($target_dir);
+        if ($pemilik !== false && function_exists('posix_getpwuid')) {
+            $info_pemilik = posix_getpwuid($pemilik);
+            $pemilik = isset($info_pemilik['name']) ? $info_pemilik['name'] : $pemilik;
+        }
+        throw new Exception("Folder files/ tidak bisa ditulis oleh PHP. Path: " . (realpath($target_dir) ?: $target_dir) . " | owner: " . $pemilik . " | user PHP: " . get_current_user() . ". Ubah permission folder ke 775/777 atau sesuaikan owner-nya.");
+    }
+
     $safe_name = time() . '_' . preg_replace('/[^A-Za-z0-9._-]/', '_', basename($namaFile));
     $target_file = $target_dir . $safe_name;
+
+    error_clear_last();
     if (!move_uploaded_file($tmp, $target_file)) {
-        throw new Exception("Gagal menyimpan file yang diunggah.");
+        if (is_uploaded_file($tmp) && @copy($tmp, $target_file)) {
+            @unlink($tmp);
+        } else {
+            $alasan = error_get_last();
+            $pesan_alasan = isset($alasan['message']) ? $alasan['message'] : 'tidak diketahui';
+            error_log('[import word] gagal simpan upload ke ' . $target_file . ' - ' . $pesan_alasan);
+            throw new Exception("Gagal menyimpan file yang diunggah. Path: " . $target_file . " | alasan: " . $pesan_alasan);
+        }
     }
 
     $question_split = "/Soal\s*:\s*[0-9]+\)/i";
