@@ -126,6 +126,7 @@ try {
 
     $content = file_get_contents($word_xml);
     $content = htmlentities(strip_tags($content, "<a:blip>"));
+    $content = preg_replace('/Materi\s+[0-9]+\s*:.*?(?=Soal\s*:\s*[0-9]+\))/is', ' ', $content);
 
     $hitung_nomor = [];
     foreach (get_numerics($content) as $marker) {
@@ -218,12 +219,12 @@ try {
             if ($option_count > 1) {
                 if ($key_option == ($option_count - 1)) {
                     if (preg_match($correct_split, $val_option)) {
-                        $correct = array_values(array_filter(preg_split($correct_split, $val_option)));
-                        $val_option = $correct[0];
-                        if (count($correct) < 2 || trim($correct[1]) == '') {
-                            throw new Exception("Kunci jawaban pada soal nomor " . $cqno . " tidak ada.");
+                        if (!preg_match('/Kunci\s*:\s*([A-E])/i', $val_option, $mk)) {
+                            throw new Exception("Kunci jawaban pada soal nomor " . $cqno . " tidak valid (harus huruf A-E).");
                         }
-                        $options['kunci'] = trim(strtoupper($correct[1]));
+                        $correct = array_values(array_filter(preg_split($correct_split, $val_option)));
+                        $val_option = isset($correct[0]) ? $correct[0] : '';
+                        $options['kunci'] = strtoupper($mk[1]);
                     } else {
                         throw new Exception("Format kunci jawaban pada soal nomor " . $cqno . " salah.");
                     }
@@ -278,7 +279,7 @@ try {
     $pg = 0;
     $es = 0;
     $g = 0;
-    $gagal = "";
+    $gagal = [];
 
     $stmt_delete = mysqli_prepare($koneksi, "DELETE FROM soal WHERE id_mapel = ? AND nomor = ? AND jenis = ?");
     $stmt_insert = mysqli_prepare($koneksi, "INSERT INTO soal (id_mapel,nomor,soal,pilA,pilB,pilC,pilD,pilE,jawaban,jenis,file1) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
@@ -307,7 +308,7 @@ try {
             if ($jns == 1) $pg++;
         } else {
             $g++;
-            $gagal .= $no . ",";
+            $gagal[] = $no . " (" . mysqli_stmt_error($stmt_insert) . ")";
         }
     }
     mysqli_stmt_close($stmt_delete);
@@ -316,7 +317,7 @@ try {
     $response = [
         "status" => "1",
         "id_mapel" => $id_mapel,
-        "hasil" => "Jumlah Soal Pilihan Ganda = " . $pg . ".\nJumlah soal Essai = " . $es . ".\nJumlah soal gagal impor = " . $g . ($g > 0 ? ", Nomor " . rtrim($gagal, ',') : '') . "."
+        "hasil" => "Jumlah Soal Pilihan Ganda = " . $pg . ".\nJumlah soal Essai = " . $es . ".\nJumlah soal gagal impor = " . $g . ($g > 0 ? ", Nomor " . implode(', ', $gagal) : '') . "."
     ];
 } catch (Exception $e) {
     $response = ["status" => "0", "hasil" => $e->getMessage()];
