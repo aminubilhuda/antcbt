@@ -3,6 +3,10 @@ $id_mapel = $_GET['id'];
 $mapelQ = mysqli_query($koneksi, "SELECT * FROM mapel where id_mapel='$id_mapel'");
 $mapel = mysqli_fetch_array($mapelQ);
 $cekmapel = mysqli_num_rows($mapelQ);
+$dataKelas = @unserialize($mapel['kelas']);
+if (!is_array($dataKelas)) {
+    $dataKelas = [$mapel['kelas']];
+}
 ?>
 <div class='row'>
     <div id="boxpesan"></div>
@@ -32,7 +36,13 @@ $cekmapel = mysqli_num_rows($mapelQ);
                                 <div class='form-group'>
                                     <label>Mata Pelajaran</label>
                                     <input type='hidden' name='id_mapel' class='form-control' value="<?= $mapel['id_mapel'] ?>" />
-                                    <input type='text' name='mapel' class='form-control' value="<?= $mapel['nama'] ?>" disabled />
+                                    <p class='form-control-static' style='margin-bottom:0'>
+                                        <b><?= htmlspecialchars($mapel['nama']) ?></b>
+                                        &nbsp;<small class='label label-primary'>Kelas <?= htmlspecialchars($mapel['level']) ?></small>
+                                        <?php foreach ($dataKelas as $k) : ?>
+                                            <small class='label label-success'><?= htmlspecialchars($k) ?></small>
+                                        <?php endforeach; ?>
+                                    </p>
                                 </div>
                                 <div class='form-group'>
                                     <label>Pilih File</label>
@@ -50,7 +60,7 @@ $cekmapel = mysqli_num_rows($mapelQ);
                     </form>
                 </div>
                 <div class='col-md-6'>
-                    <form id="formsoalword" action='pages/word_import/import/index.php/word_import' method='post' enctype='multipart/form-data'>
+                    <form id="formsoalword" action='mod_banksoal/import_word.php' method='post' enctype='multipart/form-data'>
                         <div class='box box-solid'>
                             <div class='box-header with-border'>
                                 <h3 class='box-title'>Import Soal Ms Word</h3>
@@ -63,46 +73,14 @@ $cekmapel = mysqli_num_rows($mapelQ);
                                 <div class='form-group'>
                                     <label>Mata Pelajaran</label>
                                     <input type='hidden' name='id_mapel' class='form-control' value="<?= $mapel['id_mapel'] ?>" />
-                                    <input type='text' name='mapel' class='form-control' value="<?= $mapel['nama'] ?>" disabled />
+                                    <p class='form-control-static' style='margin-bottom:0'>
+                                        <b><?= htmlspecialchars($mapel['nama']) ?></b>
+                                        &nbsp;<small class='label label-primary'>Kelas <?= htmlspecialchars($mapel['level']) ?></small>
+                                        <?php foreach ($dataKelas as $k) : ?>
+                                            <small class='label label-success'><?= htmlspecialchars($k) ?></small>
+                                        <?php endforeach; ?>
+                                    </p>
                                 </div>
-                                <tr>
-                                    <td>
-                                        <input type='hidden' name='id_bank_soal' value=<?= $_REQUEST['id'] ?>>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td> <input type='hidden' name='id_lokal' value='<?= $homeurl ?>'></td>
-                                </tr>
-                                <tr>
-                                    <td> <input type='hidden' name='cid' value='1'></td>
-                                </tr>
-                                <tr>
-                                    <td> <input type='hidden' name='lid' value='2'></td>
-                                </tr>
-                                <tr>
-                                    <td> <input type='hidden' name='question_split' value='/Q:[0-9]+\)/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='description_split' value='/FileQ:/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='question_gambar' value='/Gambar:/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='question_video' value='/Video:/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='question_audio' value='/Audio:/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='option_split' value='/[A-Z]:\)/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='option_file' value='/FileO:/'></td>
-                                </tr>
-                                <tr>
-                                    <td><input type='hidden' name='correct_split' value='/Kunci:/'></td>
-                                </tr>
                                 <div class='form-group'>
                                     <label>Pilih File</label>
                                     <input type='file' name='word_file' class='form-control' required='true' />
@@ -112,7 +90,7 @@ $cekmapel = mysqli_num_rows($mapelQ);
                                 </p>
                             </div><!-- /.box-body -->
                             <div class='box-footer'>
-                                <a href='pages/word_import/import/sample/sample.docx'><i class='fa fa-file-word-o'></i> Download Format</a>
+                                <a href='template/importsoal.docx'><i class='fa fa-file-word-o'></i> Download Format</a>
                             </div>
                         </div><!-- /.box -->
                     </form>
@@ -131,7 +109,13 @@ $cekmapel = mysqli_num_rows($mapelQ);
                                 <div class='form-group'>
                                     <label>Mata Pelajaran</label>
                                     <input type='hidden' name='id_mapel' class='form-control' value="<?= $mapel['id_mapel'] ?>" />
-                                    <input type='text' name='mapel' class='form-control' value="<?= $mapel['nama'] ?>" disabled />
+                                    <p class='form-control-static' style='margin-bottom:0'>
+                                        <b><?= htmlspecialchars($mapel['nama']) ?></b>
+                                        &nbsp;<small class='label label-primary'>Kelas <?= htmlspecialchars($mapel['level']) ?></small>
+                                        <?php foreach ($dataKelas as $k) : ?>
+                                            <small class='label label-success'><?= htmlspecialchars($k) ?></small>
+                                        <?php endforeach; ?>
+                                    </p>
                                 </div>
                                 <div class='form-group'>
                                     <label>Pilih File</label>
@@ -268,6 +252,9 @@ $cekmapel = mysqli_num_rows($mapelQ);
 
     // IMPORT SOAL WORD
     $('#formsoalword').on('submit', function(e){
+        e.preventDefault();
+        var form = this;
+        var tombol = $(form).find('button[type=submit]');
         $.ajax({
             type: 'post',
             url: 'mod_banksoal/import_word.php',
@@ -277,27 +264,51 @@ $cekmapel = mysqli_num_rows($mapelQ);
             cache: false,
             beforeSend: function() {
                 $('.loader').css('display', 'block');
+                tombol.prop('disabled', true);
             },
             success: function(response) {
-                $('.loader').css('display', 'none');
-                $('#boxpesan').html(response);
+                console.log('[import word] respons mentah:', response);
+                var obj = null;
+                try {
+                    obj = (typeof response === 'object' && response !== null) ? response : JSON.parse(response);
+                } catch (err) {
+                    var cuplik = String(response).substring(0, 200);
+                    swal({
+                        type: 'error',
+                        title: 'Respons Tidak Valid',
+                        html: 'Server tidak mengirim JSON yang valid:<br><code>' + $('<div>').text(cuplik).html() + '</code>'
+                    });
+                    return;
+                }
 
-                var obj = jQuery.parseJSON( response );
                 if (obj.status == 1) {
+                    var hasil = String(obj.hasil).replace(/\n/g, '<br>').replace(/([0-9]+)/g, '<b>$1</b>');
                     swal({
                         type: 'success',
                         title: 'Import Sukses!',
-                        text: obj.hasil
+                        html: hasil
                     }).then(function() {
                         window.location = "index.php?pg=banksoal&ac=lihat&id="+obj.id_mapel;
                     });
-                } else if (obj.status == 0) {
+                } else {
                     swal({
                         type: 'error',
                         title: 'Oops...',
                         text: obj.hasil
                     })
                 }
+            },
+            error: function(xhr, status, err) {
+                swal({
+                    type: 'error',
+                    title: 'Import Gagal',
+                    html: 'Terjadi kesalahan koneksi/server: <b>' + status + '</b> (' + err + ')'
+                });
+            },
+            complete: function() {
+                $('.loader').css('display', 'none');
+                tombol.prop('disabled', false);
+                $(form).find('input[type=file]').val('');
             }
         });
         return false;
