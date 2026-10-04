@@ -19,12 +19,14 @@ if (isset($_FILES['file']['name'])) {
 
         $sheetData = $spreadsheet->getActiveSheet()->toArray();
         $sukses = $gagal = 0;
+        $detail_gagal = [];
         $exec = mysqli_query($koneksi, "TRUNCATE siswa");
         for ($i = 1; $i < count($sheetData); $i++) {
             $id_siswa = $sheetData[$i]['0'];
             $nis = $sheetData[$i]['1'];
             $no_peserta = $sheetData[$i]['2'];
             $nama = $sheetData[$i]['3'];
+            $nama_tampil = $nama;
             $nama = addslashes($nama);
             $level = $sheetData[$i]['4'];
             $kelas = $sheetData[$i]['5'];
@@ -74,10 +76,29 @@ if (isset($_FILES['file']['name'])) {
             }
             if ($nama <> '') {
                 $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama,no_meja) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama','$no_meja')");
-                ($exec) ? $sukses++ : $gagal++;
+                if ($exec) {
+                    $sukses++;
+                } else {
+                    $gagal++;
+                    $detail_gagal[] = "Baris " . ($i + 1) . " (" . htmlspecialchars($nama_tampil) . "): gagal disimpan - " . mysqli_error($koneksi);
+                }
+            } else {
+                $gagal++;
+                $detail_gagal[] = "Baris " . ($i + 1) . ": nama kosong";
             }
         }
         echo "Berhasil: $sukses | Gagal: $gagal ";
+        if ($detail_gagal) {
+            $tampil = array_slice($detail_gagal, 0, 50);
+            echo "<ul>";
+            foreach ($tampil as $d) {
+                echo "<li>$d</li>";
+            }
+            echo "</ul>";
+            if (count($detail_gagal) > 50) {
+                echo "...dan " . (count($detail_gagal) - 50) . " baris lainnya";
+            }
+        }
     } else {
         echo "Pilih file yang bertipe xlsx or xls";
     }

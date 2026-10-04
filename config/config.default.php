@@ -6,30 +6,30 @@ session_start();
 (isset($_SESSION['id_user'])) ? $id_user = $_SESSION['id_user'] : $id_user = 0;
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 //JIKA DIINSTAL DISUBDOMAIN HOSTING HAPUS BARIS DIBAWAH INI
-$uri = $_SERVER['REQUEST_URI'];
-$pageurl = explode("/", $uri);
-if ($uri == '/') {
-	$homeurl = $protocol . $_SERVER['HTTP_HOST'];
-	(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
-	(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
-	(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
-} else {
-	$homeurl = $protocol . $_SERVER['HTTP_HOST'] . "/" . $pageurl[1];
-	(isset($pageurl[2])) ? $pg = $pageurl[2] : $pg = '';
-	(isset($pageurl[3])) ? $ac = $pageurl[3] : $ac = '';
-	(isset($pageurl[4])) ? $id = $pageurl[4] : $id = 0;
-}
+// $uri = $_SERVER['REQUEST_URI'];
+// $pageurl = explode("/", $uri);
+// if ($uri == '/') {
+// 	$homeurl = $protocol . $_SERVER['HTTP_HOST'];
+// 	(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
+// 	(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
+// 	(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
+// } else {
+// 	$homeurl = $protocol . $_SERVER['HTTP_HOST'] . "/" . $pageurl[1];
+// 	(isset($pageurl[2])) ? $pg = $pageurl[2] : $pg = '';
+// 	(isset($pageurl[3])) ? $ac = $pageurl[3] : $ac = '';
+// 	(isset($pageurl[4])) ? $id = $pageurl[4] : $id = 0;
+// }
 //HAPUS SAMPAI SINI
 
 //JIKA DIINSTAL DISUBDOMAIN HOSTING HAPUS TANDA // BARIS DIBAWAH INI
 
-//$uri = $_SERVER['REQUEST_URI'];
-//$pageurl = explode("/",$uri);
+$uri = $_SERVER['REQUEST_URI'];
+$pageurl = explode("/",$uri);
 
-//$homeurl = $protocol.$_SERVER['HTTP_HOST'];
-//(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
-//(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
-//(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
+$homeurl = $protocol.$_SERVER['HTTP_HOST'];
+(isset($pageurl[1])) ? $pg = $pageurl[1] : $pg = '';
+(isset($pageurl[2])) ? $ac = $pageurl[2] : $ac = '';
+(isset($pageurl[3])) ? $id = $pageurl[3] : $id = 0;
 
 //HAPUS SAMPAI BARIS DIATAS INI
 

@@ -1,0 +1,16 @@
+# graphify scope: kode aplikasi ANT CBT (root + config + x-panel).
+# Library pihak ketiga, aset build, media, dan data upload dikecualikan.
+/vendor/
+/plugins/
+/dist/
+/build/
+/foto/
+/berkas/
+/temp/
+/tugas/
+/x-panel/phpqrcode/
+/x-panel/mod_setting/backup_soal/
+/x-panel/mod_setting/candycbt_*.sql
+/x-panel/template/
+*.zip
+*.apk

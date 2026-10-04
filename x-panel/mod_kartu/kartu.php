@@ -65,4 +65,4 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
         </div><!-- /.box -->
     </div>
 </div>
-<iframe id='loadframe' name='frameresult' src='mod_kartu/print_kartu.php' style='display:none'></iframe>
+<iframe id='loadframe' name='frameresult' src='mod_kartu/print_kartu_new.php' style='display:none'></iframe>

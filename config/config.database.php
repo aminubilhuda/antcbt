@@ -3,7 +3,7 @@
 $host = 'localhost';
 // $user = 'root';
 $user = 'root';
-$pass = '';
+$pass = 'root';
 $debe = 'antcbt';
 
 

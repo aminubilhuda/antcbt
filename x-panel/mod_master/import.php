@@ -11,12 +11,14 @@ if (isset($_POST['importsiswa'])) :
         $data = new Spreadsheet_Excel_Reader($temp);
         $hasildata = $data->rowcount($sheet_index = 0);
         $sukses = $gagal = 0;
+        $detail_gagal = [];
         $exec = mysqli_query($koneksi, "TRUNCATE siswa");
         for ($i = 2; $i <= $hasildata; $i++) {
             $id_siswa = $data->val($i, 1);
             $nis = $data->val($i, 2);
             $no_peserta = $data->val($i, 3);
             $nama = $data->val($i, 4);
+            $nama_tampil = $nama;
             $nama = addslashes($nama);
             $level = str_replace(' ', '', $data->val($i, 5));
             $kelas = str_replace(' ', '', $data->val($i, 6));
@@ -66,11 +68,30 @@ if (isset($_POST['importsiswa'])) :
 
                 $exec = mysqli_query($koneksi, "INSERT INTO siswa (id_siswa,id_kelas,idpk,nis,no_peserta,nama,level,sesi,ruang,username,password,foto,server,agama) VALUES ('$id_siswa','$kelas','$pk','$nis','$no_peserta','$nama','$level','$sesi','$ruang','$username','$password','$foto','$server','$agama')");
 
-                ($exec) ? $sukses++ : $gagal++;
+                if ($exec) {
+                    $sukses++;
+                } else {
+                    $gagal++;
+                    $detail_gagal[] = "Baris $i (" . htmlspecialchars($nama_tampil) . "): gagal disimpan - " . mysqli_error($koneksi);
+                }
+            } else {
+                $gagal++;
+                $detail_gagal[] = "Baris $i: nama kosong";
             }
         }
         $total = $hasildata - 1;
         $info = info("Berhasil: $sukses | Gagal: $gagal | Dari: $total", 'OK');
+        if ($detail_gagal) {
+            $tampil = array_slice($detail_gagal, 0, 50);
+            $info .= "<ul>";
+            foreach ($tampil as $d) {
+                $info .= "<li>$d</li>";
+            }
+            $info .= "</ul>";
+            if (count($detail_gagal) > 50) {
+                $info .= "<p>...dan " . (count($detail_gagal) - 50) . " baris lainnya</p>";
+            }
+        }
     }
 
 endif;

@@ -455,7 +455,7 @@ endif;
 		});
 
 		function printkartu(idkelas, judul) {
-			$('#loadframe').attr('src', 'mod_kartu/print_kartu.php?id_kelas=' + idkelas);
+			$('#loadframe').attr('src', 'mod_kartu/print_kartu_new.php?id_kelas=' + idkelas);
 		}
 
 		function iCheckform() {
@@ -536,7 +536,7 @@ endif;
 			var jawab = $('#headerkartu').val();
 			$.ajax({
 				type: 'POST',
-				url: 'simpanheader.php',
+				url: 'mod_kartu/simpanheader.php',
 				data: 'jawab=' + jawab,
 				success: function(response) {
 					location.reload();

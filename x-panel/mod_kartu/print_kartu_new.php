@@ -12,131 +12,210 @@ if (date('m') >= 7 and date('m') <= 12) {
 }
 $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id_kelas='$id_kelas'"));
 
-// Fetch all students first
 $siswaQ = mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_kelas='$id_kelas' ORDER BY nama ASC");
 $siswa_array = [];
 while ($row = mysqli_fetch_array($siswaQ)) {
     $siswa_array[] = $row;
 }
+
+require_once(__DIR__ . '/../phpqrcode/phpqrcode.php');
+
+function kartu_foto($siswa, $homeurl)
+{
+    $dir = __DIR__ . '/../../foto/fotosiswa/';
+    $kandidat = [];
+    $foto = isset($siswa['foto']) ? (string) $siswa['foto'] : '';
+    if ($foto !== '' && $foto !== '1') {
+        $kandidat[] = $foto;
+    }
+    $nopeserta = isset($siswa['no_peserta']) ? (string) $siswa['no_peserta'] : '';
+    foreach ([
+        str_replace(['/', ' '], '-', $nopeserta),
+        str_replace(['/', ' '], '_', $nopeserta),
+        isset($siswa['nis']) ? (string) $siswa['nis'] : '',
+        isset($siswa['username']) ? (string) $siswa['username'] : '',
+    ] as $nama) {
+        if ($nama !== '') {
+            $kandidat[] = $nama;
+        }
+    }
+    $exts = ['', '.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG'];
+    foreach ($kandidat as $nama) {
+        foreach ($exts as $ext) {
+            $file = $nama . $ext;
+            if (is_file($dir . $file)) {
+                return $homeurl . '/foto/fotosiswa/' . $file;
+            }
+        }
+    }
+    return $homeurl . '/dist/img/avatar_default.png';
+}
+
+function kartu_qr($text)
+{
+    ob_start();
+    QRcode::png($text, null, 'L', 3, 1);
+    return base64_encode(ob_get_clean());
+}
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Kartu Peserta Ujian</title>
 <style>
 * {
     box-sizing: border-box;
     font-family: 'Arial', sans-serif;
 }
 
+body {
+    margin: 0;
+}
+
 .card {
-    width: 8.5cm;
-    border: none;
-    border-radius: 8px;
+    width: 9.2cm;
+    height: 6.5cm;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
     background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     overflow: hidden;
-    margin: 5px;
-    position: relative;
+    margin: 2px;
 }
 
 .card-header {
+    height: 1.1cm;
     background: linear-gradient(135deg, #2196F3, #1976D2);
-    padding: 6px;
-    color: white;
+    padding: 3px 6px;
+    color: #fff;
 }
 
 .header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 4px;
+    height: 100%;
 }
 
-.logo {
-    height: 30px;
-    filter: brightness(0) invert(1);
+.logo-badge {
+    height: 32px;
+    width: auto;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
 }
 
 .school-info {
     text-align: center;
-    font-size: 10px;
-    line-height: 1.4;
+    font-size: 9px;
+    line-height: 1.25;
 }
 
 .card-body {
-    padding: 8px;
+    height: calc(6.5cm - 1.1cm);
+    padding: 4px 6px;
     background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
 }
 
 .student-info {
     display: flex;
-    gap: 15px;
+    gap: 5px;
+    flex: 1;
+    min-height: 0;
 }
 
 .photo-container {
-    width: 60px;
+    width: 52px;
+    flex-shrink: 0;
 }
 
 .student-photo {
-    width: 60px;
-    height: 75px;
+    width: 52px;
+    height: 64px;
     object-fit: cover;
     border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-radius: 4px;
 }
 
 .info-container {
     flex: 1;
+    min-width: 0;
 }
 
 .info-row {
     display: flex;
-    margin-bottom: 4px;
+    margin-bottom: 1px;
 }
 
 .label {
-    width: 70px;
-    font-size: 10px;
-    color: #666;
+    width: 56px;
+    flex-shrink: 0;
+    font-size: 9px;
+    color: #555;
 }
 
 .value {
     flex: 1;
-    font-size: 10px;
-    color: #333;
-    font-weight: 500;
+    min-width: 0;
+    font-size: 9px;
+    color: #222;
+}
+
+.name-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 .credentials-box {
-    margin-top: 8px;
-    padding: 8px;
+    margin-top: 2px;
+    padding: 2px 5px;
     background: #e3f2fd;
     border-radius: 4px;
-    border-left: 4px solid #2196F3;
+    border-left: 3px solid #2196F3;
+}
+
+.qr-container {
+    width: 50px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.qr-img {
+    width: 48px;
+    height: 48px;
 }
 
 .signature-container {
-    margin-top: 12px;
+    margin-top: auto;
+    padding-top: 2px;
     text-align: center;
-    padding-top: 8px;
     border-top: 1px dashed #ddd;
 }
 
-.signature-container img {
-    height: 45px;
-    margin: 5px 0;
+.signature-title {
+    font-size: 9px;
+    color: #555;
 }
 
-.signature-title {
-    font-size: 11px;
-    color: #666;
+.ttd-img {
+    height: 34px;
+    margin: 1px 0;
 }
 
 .signature-name {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
-    margin: 4px 0;
+    margin: 1px 0;
 }
 
 .signature-nip {
-    font-size: 11px;
+    font-size: 9px;
 }
 
 .page-break {
@@ -145,101 +224,98 @@ while ($row = mysqli_fetch_array($siswaQ)) {
 }
 
 @media print {
-    .card {
-        break-inside: avoid;
-        margin: 0;
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
-    
     body {
         background: #fff;
     }
-    
+
+    .card {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .card-header,
+    .credentials-box {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
     @page {
-        margin: 1cm;
         size: A4;
+        margin: 1cm;
     }
 }
 </style>
 
-<table width='100%' align='center' cellpadding='5'>
-    <?php 
+<table width='100%' align='center' cellpadding='0' cellspacing='0'>
+    <?php
     $total_students = count($siswa_array);
-    for ($i = 0; $i < $total_students; $i += 2) : 
+    for ($i = 0; $i < $total_students; $i += 2) :
     ?>
     <tr>
         <?php for ($j = 0; $j < 2; $j++) : ?>
-            <?php if ($i + $j < $total_students) : 
+            <?php if ($i + $j < $total_students) :
                 $siswa = $siswa_array[$i + $j];
-                $nopeserta = $siswa['no_peserta'];
             ?>
-            <td width='50%'>
+            <td width='50%' valign='top'>
                 <div class="card">
                     <div class="card-header">
                         <div class="header-content">
-                            <img src='../../foto/logo_tut.svg' class="logo">
+                            <img src='../../foto/logo_tut.svg' class="logo-badge" alt="Logo">
                             <div class="school-info">
                                 <strong><?= strtoupper($setting['header_kartu']) ?></strong><br>
                                 <strong><?= strtoupper($setting['sekolah']) ?></strong><br>
                                 <span>TAHUN PELAJARAN <?= $ajaran ?></span>
                             </div>
-                            <img src="../../<?= $setting['logo'] ?>" class="logo">
+                            <img src="../../<?= $setting['logo'] ?>" class="logo-badge" alt="Logo">
                         </div>
                     </div>
-                    
+
                     <div class="card-body">
                         <div class="student-info">
                             <div class="photo-container">
-                                <?php
-                                if ($siswa['foto'] <> '') {
-                                    if (!file_exists("../foto/fotosiswa/$siswa[foto]")) {
-                                        echo "<img src='$homeurl/dist/img/avatar_default.png' class='student-photo' alt='+'>";
-                                    } else {
-                                        echo "<img src='$homeurl/foto/fotosiswa/$siswa[foto]' class='student-photo'>";
-                                    }
-                                } else {
-                                    echo "<img src='$homeurl/dist/img/avatar-01.jpg' class='student-photo' alt='+'>";
-                                }
-                                ?>
+                                <img src="<?= htmlspecialchars(kartu_foto($siswa, $homeurl)) ?>" class="student-photo" alt="Foto">
                             </div>
-                            
+
                             <div class="info-container">
                                 <div class="info-row">
                                     <div class="label">No Peserta</div>
-                                    <div class="value">: <?= $siswa['no_peserta'] ?></div>
+                                    <div class="value">: <?= htmlspecialchars((string) $siswa['no_peserta']) ?></div>
                                 </div>
                                 <div class="info-row">
                                     <div class="label">Nama</div>
-                                    <div class="value">: <strong><?= $siswa['nama'] ?></strong></div>
+                                    <div class="value name-clamp">: <strong><?= htmlspecialchars((string) $siswa['nama']) ?></strong></div>
                                 </div>
                                 <div class="info-row">
                                     <div class="label">Kelas/Sesi</div>
-                                    <div class="value">: <?= $kelas['nama'] ?> / <?= $siswa['sesi'] ?></div>
+                                    <div class="value">: <?= htmlspecialchars((string) $kelas['nama']) ?> / <?= htmlspecialchars((string) $siswa['sesi']) ?></div>
                                 </div>
-                                
+
                                 <div class="credentials-box">
                                     <div class="info-row">
                                         <div class="label">Username</div>
-                                        <div class="value">: <strong><?= $siswa['username'] ?></strong></div>
+                                        <div class="value">: <strong><?= htmlspecialchars((string) $siswa['username']) ?></strong></div>
                                     </div>
                                     <div class="info-row">
                                         <div class="label">Password</div>
-                                        <div class="value">: <strong><?= $siswa['password'] ?></strong></div>
+                                        <div class="value">: <strong><?= htmlspecialchars((string) $siswa['password']) ?></strong></div>
                                     </div>
                                     <div class="info-row">
                                         <div class="label">Ruang/Meja</div>
-                                        <div class="value">: <?= $siswa['ruang'] ?> / <?= $siswa['no_meja'] ?></div>
+                                        <div class="value">: <?= htmlspecialchars((string) $siswa['ruang']) ?> / <?= htmlspecialchars((string) $siswa['no_meja']) ?></div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="qr-container">
+                                <img src="data:image/png;base64,<?= kartu_qr((string) $siswa['no_peserta']) ?>" class="qr-img" alt="QR">
+                            </div>
                         </div>
-                        
+
                         <div class="signature-container">
                             <div class="signature-title">Kepala Sekolah</div>
-                            <img src='<?php echo '../../dist/img/ttd.png' . '?date=' . time(); ?>' alt="TTD">
-                            <div class="signature-name"><?= $setting['kepsek'] ?></div>
-                            <div class="signature-nip">NIP. <?= $setting['nip'] ?></div>
+                            <img src="../../dist/img/ttd.png?date=<?= time() ?>" class="ttd-img" alt="TTD">
+                            <div class="signature-name"><?= htmlspecialchars((string) $setting['kepsek']) ?></div>
+                            <div class="signature-nip">NIP. <?= htmlspecialchars((string) $setting['nip']) ?></div>
                         </div>
                     </div>
                 </div>
@@ -247,15 +323,16 @@ while ($row = mysqli_fetch_array($siswaQ)) {
             <?php endif; ?>
         <?php endfor; ?>
     </tr>
-    
-    <?php 
-    // Add page break every 8 cards
-    if (($i + 2) % 10 == 0 && ($i + 2) < $total_students) : 
+
+    <?php
+    if (($i + 2) % 8 == 0 && ($i + 2) < $total_students) :
     ?>
     </table>
     <div class="page-break"></div>
-    <table width='100%' align='center' cellpadding='5'>
+    <table width='100%' align='center' cellpadding='0' cellspacing='0'>
     <?php endif; ?>
-    
+
     <?php endfor; ?>
 </table>
+</body>
+</html>
