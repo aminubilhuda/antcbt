@@ -49,8 +49,6 @@ $jumlahn = '25';
 $n = ceil($jumlahData / $jumlahn);
 
 $nomer = 1;
-
-$date = date_create($cektanggal['tgl_ujian']);
 ?>
 
 <?php for ($i = 1; $i <= $n; $i++) : ?>
