@@ -3,11 +3,25 @@ require("config/config.default.php");
 require("config/config.function.php");
 //cek_session_admin();
 //Make sure that it is a POST request.
+$detail = (isset($_GET['detail']) and $_GET['detail'] == '1');
+if ($detail) {
+    header('Content-Type: application/json');
+}
+
 $token = isset($_GET['token']) ? $_GET['token'] : 'false';
 $querys = mysqli_query($koneksi, "select token_api from setting where token_api='$token'");
 $cektoken = mysqli_num_rows($querys);
 
-if ($cektoken <> 0) {
+if ($cektoken == 0) {
+    if ($detail) {
+        echo json_encode(['status' => 'gagal', 'pesan' => 'Token tidak valid']);
+    } else {
+        echo "<script>location.href='.'</script>";
+    }
+    exit;
+}
+
+try {
     if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') != 0) {
         throw new Exception('Request method must be POST!');
     }
@@ -29,15 +43,49 @@ if ($cektoken <> 0) {
         throw new Exception('Received content contained invalid JSON!');
     }
 
+    $masuk = $ada = $gagal = 0;
+    $errors = array();
+
     foreach ($decoded as $nilai) {
         $cek = mysqli_num_rows(mysqli_query($koneksi, "select * from nilai where id_siswa='$nilai[id_siswa]' and id_ujian='$nilai[id_ujian]' and id_mapel='$nilai[id_mapel]' "));
-        if ($cek == 0) {
-            mysqli_query($koneksi, "insert into nilai (id_ujian,id_mapel,id_siswa,kode_ujian,ujian_mulai,ujian_berlangsung,ujian_selesai,jml_benar,jml_salah,skor,total,ipaddress,hasil,jawaban,jawaban_esai)
+        if ($cek <> 0) {
+            $ada++;
+            continue;
+        }
+        $exec = mysqli_query($koneksi, "insert into nilai (id_ujian,id_mapel,id_siswa,kode_ujian,ujian_mulai,ujian_berlangsung,ujian_selesai,jml_benar,jml_salah,skor,total,ipaddress,hasil,jawaban,jawaban_esai)
         values ('$nilai[id_ujian]','$nilai[id_mapel]','$nilai[id_siswa]','$nilai[kode_ujian]','$nilai[ujian_mulai]','$nilai[ujian_berlangsung]','$nilai[ujian_selesai]','$nilai[jml_benar]','$nilai[jml_salah]','$nilai[skor]','$nilai[total]','$nilai[ipaddress]','$nilai[hasil]','$nilai[jawaban]','$nilai[jawaban_esai]')");
+        if ($exec) {
+            $masuk++;
+        } else {
+            $gagal++;
+            if (count($errors) < 5) {
+                $errors[] = mysqli_error($koneksi);
+            }
         }
     }
 
-    echo "berhasil";
-} else {
-    echo "<script>location.href='.'</script>";
+    if ($detail) {
+        if ($gagal == 0) {
+            $status = 'berhasil';
+        } elseif ($masuk == 0 and $ada == 0) {
+            $status = 'gagal';
+        } else {
+            $status = 'sebagian';
+        }
+        echo json_encode([
+            'status' => $status,
+            'masuk' => $masuk,
+            'ada' => $ada,
+            'gagal' => $gagal,
+            'error' => $errors
+        ]);
+    } else {
+        echo ($gagal == 0) ? "berhasil" : "gagal";
+    }
+} catch (Exception $e) {
+    if ($detail) {
+        echo json_encode(['status' => 'gagal', 'pesan' => $e->getMessage()]);
+    } else {
+        echo 'gagal';
+    }
 }

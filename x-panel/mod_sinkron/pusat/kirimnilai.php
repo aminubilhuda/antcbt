@@ -19,10 +19,11 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                             <thead>
                                 <tr>
                                     <th width='5px'>#</th>
-                                    <th>Jenis Ujian</th>
                                     <th>Kode Ujian</th>
+                                    <th>Kode Mapel</th>
                                     <th>Nilai</th>
                                     <th>Terkirim</th>
+                                    <th>Belum Kirim</th>
                                     <!-- <th>Temp</th> -->
 
                                     <th>Aksi</th>
@@ -32,6 +33,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                             <tbody>
 
                                 <?php
+                                $no = 0;
                                 if ($pengawas['level'] == 'guru') {
                                     $ujianQ = mysqli_query($koneksi, "SELECT * FROM nilai a join mapel b ON a.id_mapel=b.id_mapel where b.idguru='$id_pengawas' and b.status = 1 group by id_ujian");
                                 } else {
@@ -39,7 +41,8 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                                 }
                                 while ($ujian = mysqli_fetch_array($ujianQ)) {
                                     $terkirim = mysqli_num_rows(mysqli_query($koneksi, "select * from nilai where id_ujian='$ujian[id_ujian]' and status='1'"));
-                                    $cek = mysqli_num_rows(mysqli_query($koneksi, "select * from nilai where id_ujian='$ujian[id_ujian]' and ujian_selesai is null"));
+                                    $belum = mysqli_num_rows(mysqli_query($koneksi, "select * from nilai where id_ujian='$ujian[id_ujian]' and status is null and ujian_selesai is not null and ujian_selesai <> ''"));
+                                    $cek = mysqli_num_rows(mysqli_query($koneksi, "select * from nilai where id_ujian='$ujian[id_ujian]' and (ujian_selesai is null or ujian_selesai='')"));
                                     $cek2 = mysqli_num_rows(mysqli_query($koneksi, "select * from jawaban where id_ujian='$ujian[id_ujian]'"));
                                     if ($cek <> 0) {
                                         $dis = 'disabled';
@@ -60,6 +63,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                                     <td>$ujian[kode]</td>
                                     <td>$datanilai</td>
                                     <td>$terkirim </td>
+                                    <td>$belum </td>
                                     <!--<td>$tempjawaban</td>-->
                                     
                                     <td>
