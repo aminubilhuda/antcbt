@@ -103,7 +103,7 @@ if ($pg == 'copy_bank') {
     $status = $mapel['status'];
     $opsi = $mapel['opsi'];
     $kkm = $mapel['kkm'];
-    $agama = $mapel['agama'];
+    $agama = $mapel['soal_agama'];
     $kelas = $mapel['kelas'];
     $id_pk = $mapel['idpk'];
     $guru = $mapel['idguru'];
@@ -115,6 +115,8 @@ if ($pg == 'copy_bank') {
         $exec = mysqli_query($koneksi, "INSERT INTO mapel (kode, idpk, nama, jml_soal,jml_esai,level,status,idguru,bobot_pg,bobot_esai,tampil_pg,tampil_esai,kelas,opsi,kkm,soal_agama) VALUES ('$kode','$id_pk','$nama','$jml_soal','$jml_esai','$level','$status','$guru','$bobot_pg','$bobot_esai','$tampil_pg','$tampil_esai','$kelas','$opsi','$kkm','$agama')");
         if ($exec) {
             echo "OK";
+        } else {
+            echo mysqli_error($koneksi);
         }
     endif;
 }

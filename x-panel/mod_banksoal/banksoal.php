@@ -139,7 +139,7 @@ if ($ac == '') :
                                                 url: 'mod_banksoal/crud_banksoal.php?pg=copy_bank',
                                                 data: $(this).serialize(),
                                                 success: function(data) {
-                                                    if (data == "OK") {
+                                                    if ($.trim(data) == "OK") {
                                                         toastr.success("bank soal berhasil digandakan");
                                                     } else {
                                                         toastr.error(data);
