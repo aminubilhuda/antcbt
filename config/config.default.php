@@ -4,7 +4,20 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
 (isset($_SESSION['id_user'])) ? $id_user = $_SESSION['id_user'] : $id_user = 0;
-$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+// $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+
+// ==== AWAL PERBAIKAN PROTOKOL (Cloudflare Tunnel -> origin HTTP) ====
+// Deteksi HTTPS juga saat berada di belakang reverse proxy/Cloudflare Tunnel.
+// Origin nginx diakses via http://...:7373, sehingga $_SERVER['HTTPS'] kosong dan
+// SERVER_PORT bukan 443. Tanpa ini $homeurl bernilai http:// sehingga URL AJAX di
+// JavaScript diblokir browser sebagai mixed content (loading soal tidak pernah selesai).
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')
+    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+    || (isset($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], '"scheme":"https"') !== false);
+$protocol = $isHttps ? "https://" : "http://";
+// ==== AKHIR PERBAIKAN PROTOKOL ====
+
 //JIKA DIINSTAL DISUBDOMAIN HOSTING HAPUS BARIS DIBAWAH INI
 // $uri = $_SERVER['REQUEST_URI'];
 // $pageurl = explode("/", $uri);

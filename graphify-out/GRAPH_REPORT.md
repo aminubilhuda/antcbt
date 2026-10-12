@@ -1,11 +1,11 @@
-# Graph Report - .  (2026-10-03)
+# Graph Report - /Users/godboy/Project/php/antcbt  (2026-10-05)
 
 ## Corpus Check
-- 131 files · ~110,163 words
+- 16 files · ~111,155 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 400 nodes · 544 edges · 128 communities (123 shown, 5 thin omitted)
+- 403 nodes · 547 edges · 128 communities (123 shown, 5 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 1% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
 
@@ -65,18 +65,18 @@ Cohesion: 0.26
 Nodes (4): array_comb(), GetInt4d(), gmgetdate(), OLERead
 
 ### Community 6 - "OLE Excel Parser #2"
-Cohesion: 0.29
+Cohesion: 0.33
 Nodes (4): array_comb(), GetInt4d(), gmgetdate(), OLERead
 
 ### Community 7 - "OLE Excel Parser #3"
 Cohesion: 0.33
-Nodes (4): array_comb(), GetInt4d(), gmgetdate(), OLERead
+Nodes (5): array_comb(), GetInt4d(), gmgetdate(), OLERead, v()
 
 ### Community 9 - "Word Import Helpers"
 Cohesion: 0.60
 Nodes (3): rrmdir(), word_file_import(), xml_attribute()
 
-### Community 10 - "Composer Dependencies"
+### Community 11 - "Composer Dependencies"
 Cohesion: 0.50
 Nodes (3): require, phpoffice/phpspreadsheet, phpoffice/phpword
 
@@ -102,11 +102,11 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `acs.jpg (White Surface Texture Asset)` and `White Surface Texture`?**
   _Edge tagged AMBIGUOUS (relation: rationale_for) - confidence is low._
-- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #3` to `OLE Excel Parser #1`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
-- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #2` to `OLE Excel Parser #2`?**
+- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #1` to `OLE Excel Parser #2`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #1` to `OLE Excel Parser #3`?**
+- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #2` to `OLE Excel Parser #3`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `Spreadsheet_Excel_Reader` connect `Spreadsheet Excel Reader #3` to `OLE Excel Parser #1`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **What connects `phpoffice/phpword`, `phpoffice/phpspreadsheet`, `HttpErrorPages Template (AndiDittrich)` to the rest of the system?**
   _6 weakly-connected nodes found - possible documentation gaps or missing edges._
