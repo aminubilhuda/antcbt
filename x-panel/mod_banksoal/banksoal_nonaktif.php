@@ -174,7 +174,7 @@ if ($ac == '') :
                                                             <div class="col-md-6">
                                                                 <div class='form-group'>
                                                                     <label>Mata Pelajaran</label>
-                                                                    <select name='nama' class='form-control' required='true'>
+                                                                    <select name='nama' class='form-control select2' style='width:100%' data-placeholder='Pilih Mata Pelajaran' required='true'>
                                                                         <option value=''></option>
                                                                         <?php
                                                                         $pkQ = mysqli_query($koneksi, "SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
@@ -383,8 +383,8 @@ if ($ac == '') :
                             <div class="col-md-6">
                                 <div class='form-group'>
                                     <label>Mata Pelajaran</label>
-                                    <select name='nama' class='form-control' required='true'>
-                                        <option value=''></option>";
+                                    <select name='nama' class='form-control select2' style='width:100%' data-placeholder='Pilih Mata Pelajaran' required='true'>
+                                        <option value=''></option>
                                         <?php
                                         $pkQ = mysqli_query($koneksi, "SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
                                         while ($pk = mysqli_fetch_array($pkQ)) {
