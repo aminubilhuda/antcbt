@@ -150,7 +150,7 @@ endforeach;
 $ujianarray = json_encode($ujianarray);
 $ujianarray = enkripsi($ujianarray);
 $insertnilai = insert($koneksi, 'nilai', $nilaidata);
-if ($insertnilai) {
+if ($insertnilai == 'OK') {
     insert($koneksi, 'log', $logdata);
 } ?>
 <script>

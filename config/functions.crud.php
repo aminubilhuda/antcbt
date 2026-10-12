@@ -9,7 +9,11 @@
         $command .=' ('.substr($field,1).')';
         $command .=' VALUES('.substr($value,1).')';
         $exec = mysqli_query($koneksi, $command);
-        ($exec) ? $status = 'OK' : $status = 'NO';
+        if ($exec) {
+            $status = 'OK';
+        } else {
+            $status = 'NO : ' . mysqli_error($koneksi);
+        }
         return $status;
     }
     
@@ -28,7 +32,11 @@
 			$command = str_replace('#',' AND ',$command);
 		}
         $exec = mysqli_query($koneksi, $command);
-        ($exec) ? $status = 'OK' : $status = 'NO';
+        if ($exec) {
+            $status = 'OK';
+        } else {
+            $status = 'NO : ' . mysqli_error($koneksi);
+        }
         return $status;
     }
     

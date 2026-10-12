@@ -17,7 +17,8 @@ if ($pg == 'ubah') {
         'level'        => $_POST['level'],
         'username'     => $_POST['username'],
         'server'       => $_POST['server'],
-        'agama'        => $_POST['agama']
+        'agama'        => $_POST['agama'],
+        'no_meja'      => $_POST['no_meja'] ?? ''
     ];
 
     if ($_POST['pass1']) {
@@ -44,7 +45,8 @@ if ($pg == 'tambah') {
         'username'     => $_POST['username'],
         'password'     => $_POST['pass1'],
         'server'       => $_POST['server'],
-        'agama'        => $_POST['agama']
+        'agama'        => $_POST['agama'],
+        'no_meja'      => $_POST['no_meja'] ?? ''
     ];
     $cekuser = rowcount($koneksi, 'siswa', ['username' => $_POST['username']]);
     if ($cekuser > 0) {

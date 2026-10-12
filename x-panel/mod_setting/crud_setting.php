@@ -27,7 +27,7 @@ if ($pg == 'setting_app') {
         'waktu' => $_POST['waktu']
     ];
     $exec = update($koneksi, 'setting', $data, ['id_setting' => 1]);
-    if ($exec) {
+    if ($exec == 'OK') {
         $ektensi = ['jpg', 'png'];
         if ($_FILES['logo']['name'] <> '') {
             $logo = $_FILES['logo']['name'];
@@ -71,7 +71,8 @@ if ($pg == 'tambah') {
         'username'     => $_POST['username'],
         'password'     => $_POST['pass1'],
         'server'       => $_POST['server'],
-        'agama'        => $_POST['agama']
+        'agama'        => $_POST['agama'],
+        'no_meja'      => $_POST['no_meja'] ?? ''
     ];
     $cekuser = rowcount($koneksi, 'siswa', ['username' => $_POST['username']]);
     if ($cekuser > 0) {

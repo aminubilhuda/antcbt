@@ -177,6 +177,10 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class='form-group'>
+                                            <label>No Meja</label>
+                                            <input type='text' name='no_meja' class='form-control' maxlength='2' />
+                                        </div>
                                         <div class='modal-footer'>
                                             <div class='box-tools pull-right btn-group'>
                                                 <button type='submit' name='tambahsiswa' class='btn btn-sm btn-primary'><i class='fa fa-check'></i> Simpan</button>
@@ -340,6 +344,10 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
                                     <input type='password' name='pass2' class='form-control' />
                                 </div>
                             </div>
+                        </div>
+                        <div class='form-group'>
+                            <label>No Meja</label>
+                            <input type='text' name='no_meja' class='form-control' maxlength='2' value="<?= $siswa['no_meja'] ?>" />
                         </div>
                     </div>
                 </div>
