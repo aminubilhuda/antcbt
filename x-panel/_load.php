@@ -30,7 +30,13 @@ if (isset($_GET['pg'])) {
 						</div><!-- /.direct-chat-msg -->
 					";
 			} else {
-				($log['type'] == 'testongoing') ? $icon = 'fa-pencil-square-o' : $icon = 'fa-check-square-o';
+				if ($log['type'] == 'pelanggaran') {
+					$icon = 'fa-exclamation-triangle text-red';
+				} elseif ($log['type'] == 'testongoing') {
+					$icon = 'fa-pencil-square-o';
+				} else {
+					$icon = 'fa-check-square-o';
+				}
 				echo "
 						<div class='direct-chat-msg right'>
 							<div class='direct-chat-info clearfix'>

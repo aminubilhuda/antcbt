@@ -716,5 +716,24 @@ if ($pg == 'jawab') {
         $exec = update($koneksi, 'jawaban', array('ragu' => 0), $where);
     }
     echo $exec;
+} elseif ($pg == 'pelanggaran') {
+    $pelanggaransiswa = (isset($_SESSION['id_siswa'])) ? (int) $_SESSION['id_siswa'] : 0;
+    $pelanggaranujian = (int) @$_POST['id_ujian'];
+    $pelanggaranmode = (isset($_POST['mode']) && $_POST['mode'] == 'cek') ? 'cek' : 'catat';
+    $nilaiujian = fetch($koneksi, 'nilai', array('id_siswa' => $pelanggaransiswa, 'id_ujian' => $pelanggaranujian));
+    if ($nilaiujian == null) {
+        echo 0;
+    } else {
+        if ($pelanggaranmode == 'catat' && ($nilaiujian['ujian_selesai'] == null || $nilaiujian['ujian_selesai'] == '')) {
+            insert($koneksi, 'log', array(
+                'id_siswa' => $pelanggaransiswa,
+                'type' => 'pelanggaran',
+                'text' => 'pindah tab',
+                'date' => $datetime
+            ));
+        }
+        $jmlpelanggaran = mysqli_num_rows(mysqli_query($koneksi, "SELECT id_log FROM log WHERE id_siswa='$pelanggaransiswa' AND type='pelanggaran' AND date >= '$nilaiujian[ujian_mulai]'"));
+        echo $jmlpelanggaran;
+    }
 }
 ?>

@@ -5,16 +5,22 @@ require("../../config/functions.crud.php");
 cek_session_guru();
 (isset($_GET['pg'])) ? $pg = $_GET['pg'] : $pg = '';
 if ($pg == 'selesaikan') {
-    $idnilai = $_POST['id'];
-    $nilai = fetch($koneksi, 'nilai', array('id_nilai' => $idnilai));
-    $idm = $nilai['id_mapel'];
-    $ids = $nilai['id_siswa'];
-    $idu = $nilai['id_ujian'];
-    $where = array(
-        'id_mapel' => $idm,
-        'id_siswa' => $ids,
-        'id_ujian' => $idu
-    );
+    $idnilais = (isset($_POST['id'])) ? (array) $_POST['id'] : array();
+    $berhasil = $dilewati = 0;
+    foreach ($idnilais as $idnilai) {
+        $nilai = fetch($koneksi, 'nilai', array('id_nilai' => (int) $idnilai));
+        if ($nilai == null || $nilai['ujian_selesai'] <> '') {
+            $dilewati++;
+            continue;
+        }
+        $idm = $nilai['id_mapel'];
+        $ids = $nilai['id_siswa'];
+        $idu = $nilai['id_ujian'];
+        $where = array(
+            'id_mapel' => $idm,
+            'id_siswa' => $ids,
+            'id_ujian' => $idu
+        );
 
     $benar = $salah = 0;
     $mapel = fetch($koneksi, 'mapel', array('id_mapel' => $idm));
@@ -70,9 +76,21 @@ if ($pg == 'selesaikan') {
         'jawaban' => serialize($arrayjawab),
         'jawaban_esai' => serialize($arrayjawabesai)
     );
-    $simpan = update($koneksi, 'nilai', $data, $where);
-    echo mysqli_error($koneksi);
-    mysqli_query($koneksi, "INSERT INTO log (id_siswa,type,text,date) VALUES ('$ids','login','Selesai Ujian','$tanggal $waktu')");
+    update($koneksi, 'nilai', $data, $where);
+        mysqli_query($koneksi, "INSERT INTO log (id_siswa,type,text,date) VALUES ('$ids','login','Selesai Ujian','$tanggal $waktu')");
+        $berhasil++;
+    }
+    if ($berhasil > 0) {
+        echo "$berhasil ujian diselesaikan";
+        if ($dilewati > 0) {
+            echo ", $dilewati dilewati";
+        }
+    } else {
+        echo "Tidak ada ujian berlangsung yang diproses";
+        if ($dilewati > 0) {
+            echo " ($dilewati dilewati)";
+        }
+    }
 }
 if ($pg == 'resetlogin') {
     $kode = $_POST['kode'];
@@ -84,17 +102,34 @@ if ($pg == 'resetlogin') {
     }
 }
 if ($pg == 'ulangujian') {
-    $idnilai = $_POST['id'];
-    $nilai = fetch($koneksi, 'nilai', array('id_nilai' => $idnilai));
-    $idu = $nilai['id_ujian'];
-    $idm = $nilai['id_mapel'];
-    $ids = $nilai['id_siswa'];
-    $where2 = array(
-        'id_mapel' => $idm,
-        'id_siswa' => $ids,
-        'id_ujian' => $idu
-    );
-    delete($koneksi, 'nilai', ['id_nilai' => $idnilai]);
-    delete($koneksi, 'pengacak', $where2);
-    delete($koneksi, 'jawaban', $where2);
+    $idnilais = (isset($_POST['id'])) ? (array) $_POST['id'] : array();
+    $berhasil = $dilewati = 0;
+    foreach ($idnilais as $idnilai) {
+        $idnilai = (int) $idnilai;
+        $nilai = fetch($koneksi, 'nilai', array('id_nilai' => $idnilai));
+        if ($nilai == null || $nilai['ujian_selesai'] == '') {
+            $dilewati++;
+            continue;
+        }
+        $where2 = array(
+            'id_mapel' => $nilai['id_mapel'],
+            'id_siswa' => $nilai['id_siswa'],
+            'id_ujian' => $nilai['id_ujian']
+        );
+        delete($koneksi, 'nilai', ['id_nilai' => $idnilai]);
+        delete($koneksi, 'pengacak', $where2);
+        delete($koneksi, 'jawaban', $where2);
+        $berhasil++;
+    }
+    if ($berhasil > 0) {
+        echo "$berhasil ujian diulang";
+        if ($dilewati > 0) {
+            echo ", $dilewati dilewati";
+        }
+    } else {
+        echo "Tidak ada ujian selesai yang diproses";
+        if ($dilewati > 0) {
+            echo " ($dilewati dilewati)";
+        }
+    }
 }

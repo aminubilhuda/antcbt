@@ -43,6 +43,7 @@ while ($nilai = mysqli_fetch_array($nilaiq)) {
         }
         echo "
 																<tr>
+																	<td><input type='checkbox' class='cekpilihstatus' value='$nilai[id_nilai]'></td>
 																	<td>$no</td>
 																	<td>$siswa[nis]</td>
 																	<td>$siswa[nama]</td>
@@ -61,6 +62,8 @@ while ($nilai = mysqli_fetch_array($nilaiq)) {
 }
 ?>
 <script>
+    if (typeof window.statusallBound == 'undefined') {
+        window.statusallBound = true;
     $(document).on('click', '.hapus', function() {
         var id = $(this).data('id');
         console.log(id);
@@ -104,10 +107,11 @@ while ($nilai = mysqli_fetch_array($nilaiq)) {
                     method: "POST",
                     data: 'id=' + id,
                     success: function(data) {
-                        toastr.success("berhasil diulang");
+                        toastr.success(data);
                     }
                 });
             }
         })
     });
+    }
 </script>

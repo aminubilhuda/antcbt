@@ -764,6 +764,8 @@ $tglsekarang = time();
                     <?php
                     $ac = dekripsi($ac);
                     $id = dekripsi($id);
+                    $batas_pelanggaran = 5;
+                    $jmlpelanggaran = 0;
                     $qcek = mysqli_query($koneksi, "select * from nilai where id_ujian='$ac' and id_siswa='$id'");
                     $cek = mysqli_num_rows($qcek);
                     if ($cek <> 0) :
@@ -789,6 +791,7 @@ $tglsekarang = time();
                         $mapel = fetch($koneksi, 'ujian', array('id_mapel' => $id_mapel, 'id_ujian' => $ac));
                         update($koneksi, 'nilai', array('ujian_berlangsung' => $datetime), $where2);
                         $nilai = fetch($koneksi, 'nilai', $where2);
+                        $jmlpelanggaran = mysqli_num_rows(mysqli_query($koneksi, "SELECT id_log FROM log WHERE id_siswa='$id_siswa' AND type='pelanggaran' AND date >= '$nilai[ujian_mulai]'"));
                         $habis = strtotime($nilai['ujian_berlangsung']) - strtotime($nilai['ujian_mulai']);
                         $detik = ($mapel['lama_ujian'] * 60) - $habis;
                         $dtk = $detik % 60;
@@ -932,6 +935,108 @@ $tglsekarang = time();
             };
             var homeurl;
             homeurl = '<?= $homeurl ?>';
+            var pelanggaranujian = '<?= $ac ?>';
+            var bataspelanggaran = <?= $batas_pelanggaran ?>;
+            var jmlpelanggaran = <?= $jmlpelanggaran ?>;
+            var pelanggaranpending = false;
+            var pelanggaranakhir = false;
+            var ujianselesai = false;
+            var judulujian = document.title;
+            function tampilkanperingatan() {
+                if (pelanggaranakhir) return;
+                swal({
+                    title: 'Peringatan!',
+                    html: 'Anda terdeteksi meninggalkan halaman ujian.<br>Pelanggaran ke-<b>' + jmlpelanggaran + '</b> dari ' + bataspelanggaran + '.<br>Jika mencapai ' + bataspelanggaran + ' kali, ujian akan diakhiri otomatis.',
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Lanjutkan Ujian',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+            }
+            function sinkronpelanggaran() {
+                $.ajax({
+                    type: 'POST',
+                    url: homeurl + '/soal.php',
+                    data: {
+                        pg: 'pelanggaran',
+                        mode: 'cek',
+                        id_ujian: pelanggaranujian
+                    },
+                    success: function(response) {
+                        var jmlserver = parseInt($.trim(response));
+                        if (isNaN(jmlserver) || jmlserver <= jmlpelanggaran) return;
+                        jmlpelanggaran = jmlserver;
+                        if (jmlpelanggaran >= bataspelanggaran) {
+                            akhiripelanggaran();
+                        } else {
+                            tampilkanperingatan();
+                        }
+                    }
+                });
+            }
+            function akhiripelanggaran() {
+                if (pelanggaranakhir) return;
+                pelanggaranakhir = true;
+                swal({
+                    title: 'Ujian Diakhiri',
+                    html: 'Anda terdeteksi meninggalkan halaman ujian sebanyak <b>' + jmlpelanggaran + ' kali</b>.<br>Ujian diakhiri otomatis.',
+                    type: 'error',
+                    showCancelButton: false,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Mengerti',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(function() {
+                    window.selesai();
+                });
+            }
+            document.addEventListener('visibilitychange', function() {
+                if (ujianselesai) return;
+                if (document.hidden) {
+                    pelanggaranpending = true;
+                    jmlpelanggaran++;
+                    document.title = '!! JANGAN TINGGALKAN HALAMAN UJIAN - ' + judulujian;
+                    $.ajax({
+                        type: 'POST',
+                        url: homeurl + '/soal.php',
+                        data: {
+                            pg: 'pelanggaran',
+                            id_ujian: pelanggaranujian
+                        },
+                        success: function(response) {
+                            var jmlserver = parseInt($.trim(response));
+                            if (!isNaN(jmlserver) && jmlserver > jmlpelanggaran) {
+                                jmlpelanggaran = jmlserver;
+                            }
+                        }
+                    });
+                } else {
+                    document.title = judulujian;
+                    if (pelanggaranpending) {
+                        pelanggaranpending = false;
+                        if (jmlpelanggaran >= bataspelanggaran) {
+                            akhiripelanggaran();
+                        } else {
+                            tampilkanperingatan();
+                        }
+                    }
+                }
+            });
+            $(document).on('click', 'a', function() {
+                if (this.href && this.href.indexOf('logout') !== -1) {
+                    ujianselesai = true;
+                }
+            });
+            $(document).ready(function() {
+                if (jmlpelanggaran >= bataspelanggaran) {
+                    akhiripelanggaran();
+                } else if (jmlpelanggaran > 0) {
+                    tampilkanperingatan();
+                }
+                setTimeout(sinkronpelanggaran, 1000);
+            });
             $(document).ready(function() {
                 $("#modalnosoal").on('shown.bs.modal', function() {
                     var idmapel = '<?= $id_mapel  ?>';
@@ -1040,6 +1145,7 @@ $tglsekarang = time();
                     soalFont(fontSize)
                 });
                 function selesai() {
+                    ujianselesai = true;
                     var idmapel = '<?= $id_mapel  ?>';
                     var idsiswa = '<?= $id_siswa  ?>';
                     $.ajax({
@@ -1063,6 +1169,7 @@ $tglsekarang = time();
                         }
                     });
                 }
+                window.selesai = selesai;
                 $(document).on('click', '.done-btn', function() {
                     var idmapel = '<?= $id_mapel  ?>';
                     var idsiswa = '<?= $id_siswa  ?>';
