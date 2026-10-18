@@ -460,6 +460,8 @@
 <?php elseif ($pg == 'statusall') : ?>
     <?php cek_session_admin(); ?>
     <?php include "mod_status/status_peserta.php"; ?>
+<?php elseif ($pg == 'laporanpelanggaran') : ?>
+    <?php include "mod_status/laporan_pelanggaran.php"; ?>
 <?php elseif ($pg == 'statussiswa') : ?>
     <?php if ($ac == '') : ?>
         <div class='row'>

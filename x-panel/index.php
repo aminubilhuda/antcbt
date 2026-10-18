@@ -268,6 +268,7 @@ endif;
 							<ul class='treeview-menu'>
 								<li><a href='?pg=jadwal'><i class='fas fa-angle-double-right fa-fw'></i> <span> Jadwak Ujian</span></a></li>
 								<li><a href='?pg=reset'><i class='fas fa-angle-double-right  fa-fw'></i> <span>Reset Ujian</span></a></li>
+								<li><a href='?pg=laporanpelanggaran'><i class='fas fa-angle-double-right  fa-fw'></i> <span>Laporan Pelanggaran</span></a></li>
 
 							</ul>
 						</li>

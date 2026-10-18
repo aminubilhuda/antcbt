@@ -4,12 +4,14 @@ include "../../config/config.function.php";
 cek_session_admin();
 $pengawas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM pengawas  WHERE id_pengawas='$_SESSION[id_pengawas]'"));
 $tglsekarang = date('Y-m-d');
+$kolom = "s.id_nilai, s.id_siswa, s.id_mapel, s.kode_ujian, s.ujian_mulai, s.ujian_berlangsung, s.ujian_selesai, s.jml_benar, s.jml_salah, s.skor, s.ipaddress, b.nis, b.nama AS nama_siswa, b.id_kelas, k.nama AS nama_kelas, m.nama AS nama_mapel, m.level AS level_mapel";
+$dari = "FROM nilai s LEFT JOIN ujian c ON s.id_ujian=c.id_ujian LEFT JOIN siswa b ON b.id_siswa=s.id_siswa LEFT JOIN kelas k ON k.id_kelas=b.id_kelas LEFT JOIN mapel m ON m.id_mapel=s.id_mapel";
 if ($pengawas['level'] == 'admin') {
-    $nilaiq = mysqli_query($koneksi, "SELECT *  FROM nilai  s LEFT JOIN ujian c ON s.id_ujian=c.id_ujian  where c.status='1' and s.id_siswa<>'' GROUP by s.id_nilai ORDER BY s.id_nilai DESC");
+    $nilaiq = mysqli_query($koneksi, "SELECT $kolom $dari WHERE c.status='1' AND s.id_siswa<>'' ORDER BY s.id_nilai DESC");
 } elseif ($pengawas['level'] == 'pengawas') {
-    $nilaiq = mysqli_query($koneksi, "SELECT *  FROM nilai  s LEFT JOIN ujian c ON s.id_ujian=c.id_ujian  JOIN siswa b ON b.id_siswa=s.id_siswa where c.status='1' and s.id_siswa<>'' and b.ruang='$pengawas[ruang]' GROUP by s.id_nilai ORDER BY s.id_nilai DESC");
+    $nilaiq = mysqli_query($koneksi, "SELECT $kolom $dari WHERE c.status='1' AND s.id_siswa<>'' AND b.ruang='$pengawas[ruang]' ORDER BY s.id_nilai DESC");
 } else {
-    $nilaiq = mysqli_query($koneksi, "SELECT *  FROM nilai  s LEFT JOIN ujian c ON s.id_ujian=c.id_ujian  where c.status='1' and s.id_siswa<>'' and c.id_guru='$_SESSION[id_pengawas]' GROUP by s.id_nilai ORDER BY s.id_nilai DESC");
+    $nilaiq = mysqli_query($koneksi, "SELECT $kolom $dari WHERE c.status='1' AND s.id_siswa<>'' AND c.id_guru='$_SESSION[id_pengawas]' ORDER BY s.id_nilai DESC");
 }
 while ($nilai = mysqli_fetch_array($nilaiq)) {
     $tglx = strtotime($nilai['ujian_mulai']);
@@ -18,28 +20,29 @@ while ($nilai = mysqli_fetch_array($nilaiq)) {
         $no++;
         $ket = '';
         $lama = $jawaban = $skor = '--';
-        $siswa = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_siswa='$nilai[id_siswa]' "));
-        $kelas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM kelas WHERE id_kelas='$siswa[id_kelas]'"));
-        $mapel = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM mapel WHERE id_mapel='$nilai[id_mapel]'"));
-        $nilaiQ = mysqli_query($koneksi, "SELECT * FROM nilai WHERE id_siswa='$siswa[id_siswa]'");
-        $nilaiC = mysqli_num_rows($nilaiQ);
+        $selisih = 0;
+        $siswa = array(
+            'nis' => $nilai['nis'],
+            'nama' => $nilai['nama_siswa'],
+            'id_kelas' => $nilai['id_kelas']
+        );
+        $kelas = array('nama' => $nilai['nama_kelas']);
+        $mapel = array('nama' => $nilai['nama_mapel'], 'level' => $nilai['level_mapel']);
 
-        if ($nilaiC <> 0) {
-            $lama = '';
-            if ($nilai['ujian_mulai'] <> '' and $nilai['ujian_selesai'] <> '') {
-                $selisih = strtotime($nilai['ujian_selesai']) - strtotime($nilai['ujian_mulai']);
+        $lama = '';
+        if ($nilai['ujian_mulai'] <> '' and $nilai['ujian_selesai'] <> '') {
+            $selisih = strtotime($nilai['ujian_selesai']) - strtotime($nilai['ujian_mulai']);
 
-                $jawaban = "<small class='label bg-green'>$nilai[jml_benar] <i class='fa fa-check'></i></small>  <small class='label bg-red'>$nilai[jml_salah] <i class='fa fa-times'></i></small>";
-                $skor = "<small class='label bg-green'>" . number_format($nilai['skor'], 2, '.', '') . "</small>";
-                $ket = "<label class='label label-success'>Tes Selesai</label>";
-                $btn = "<button data-id='$nilai[id_nilai]' class='ulang btn btn-xs btn-danger'>ulang</button>";
-            } elseif ($nilai['ujian_mulai'] <> '' and $nilai['ujian_selesai'] == '') {
-                $selisih = strtotime($nilai['ujian_berlangsung']) - strtotime($nilai['ujian_mulai']);
+            $jawaban = "<small class='label bg-green'>$nilai[jml_benar] <i class='fa fa-check'></i></small>  <small class='label bg-red'>$nilai[jml_salah] <i class='fa fa-times'></i></small>";
+            $skor = "<small class='label bg-green'>" . number_format($nilai['skor'], 2, '.', '') . "</small>";
+            $ket = "<label class='label label-success'>Tes Selesai</label>";
+            $btn = "<button data-id='$nilai[id_nilai]' class='ulang btn btn-xs btn-danger'>ulang</button>";
+        } elseif ($nilai['ujian_mulai'] <> '' and $nilai['ujian_selesai'] == '') {
+            $selisih = strtotime($nilai['ujian_berlangsung']) - strtotime($nilai['ujian_mulai']);
 
-                $ket = "<label class='label label-danger'><i class='fa fa-spin fa-spinner' title='Sedang ujian'></i>&nbsp;Masih Dikerjakan</label>";
+            $ket = "<label class='label label-danger'><i class='fa fa-spin fa-spinner' title='Sedang ujian'></i>&nbsp;Masih Dikerjakan</label>";
 
-                $btn = "<button data-id='$nilai[id_nilai]' class='hapus btn btn-xs btn-danger'>selesai</button>";
-            }
+            $btn = "<button data-id='$nilai[id_nilai]' class='hapus btn btn-xs btn-danger'>selesai</button>";
         }
         echo "
 																<tr>

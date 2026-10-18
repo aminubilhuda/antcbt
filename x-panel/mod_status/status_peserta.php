@@ -1,4 +1,6 @@
-<?php if ($ac == '') : ?>
+<?php
+$setting_refresh = (isset($setting['refresh_status']) && $setting['refresh_status'] > 0) ? (int) $setting['refresh_status'] : 5;
+if ($ac == '') : ?>
     <div class='row'>
         <div class='col-md-12'>
 
@@ -14,7 +16,7 @@
                     <div class='alert alert-info'>
                         <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
                         <i class='icon fa fa-info'></i>
-                        Status peserta akan muncul saat ujian berlangsung dan refresh setiap 5 detik..
+                        Status peserta akan muncul saat ujian berlangsung dan refresh setiap <?= $setting_refresh ?> detik..
                     </div>
 
                     <div class='table-responsive'>
@@ -129,9 +131,33 @@
         kirimAksiMassal('ulangujian', 'Apa anda yakin?', 'Akan mengulang %d ujian terpilih?');
     });
 
-    var autoRefresh = setInterval(
-        function() {
-            $('#divstatus').load("mod_status/statusall.php", pulihkanCeklis);
-        }, 1000
-    );
+    var refreshStatusInterval = <?= $setting_refresh ?> * 1000;
+    var autoRefresh = null;
+
+    function muatStatus() {
+        $('#divstatus').load("mod_status/statusall.php", pulihkanCeklis);
+    }
+
+    function mulaiRefreshStatus() {
+        if (autoRefresh) return;
+        autoRefresh = setInterval(muatStatus, refreshStatusInterval);
+    }
+
+    function hentikanRefreshStatus() {
+        if (autoRefresh) {
+            clearInterval(autoRefresh);
+            autoRefresh = null;
+        }
+    }
+
+    mulaiRefreshStatus();
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            hentikanRefreshStatus();
+        } else {
+            muatStatus();
+            mulaiRefreshStatus();
+        }
+    });
 </script>

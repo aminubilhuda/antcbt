@@ -24,7 +24,9 @@ if ($pg == 'setting_app') {
         'email' => $_POST['email'],
         'header' => $header,
         'ip_server' => $_POST['ipserver'],
-        'waktu' => $_POST['waktu']
+        'waktu' => $_POST['waktu'],
+        'batas_pelanggaran' => $_POST['batas_pelanggaran'],
+        'refresh_status' => $_POST['refresh_status']
     ];
     $exec = update($koneksi, 'setting', $data, ['id_setting' => 1]);
     if ($exec == 'OK') {

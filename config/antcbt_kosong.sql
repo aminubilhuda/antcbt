@@ -472,7 +472,9 @@ CREATE TABLE `setting` (
   `token_api` varchar(50) DEFAULT NULL,
   `sekolah_id` varchar(50) DEFAULT NULL,
   `npsn` varchar(10) DEFAULT NULL,
-  `db_versi` varchar(10) DEFAULT NULL
+  `db_versi` varchar(10) DEFAULT NULL,
+  `batas_pelanggaran` int(11) NOT NULL DEFAULT 5,
+  `refresh_status` int(11) NOT NULL DEFAULT 5
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

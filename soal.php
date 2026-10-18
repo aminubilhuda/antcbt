@@ -2,6 +2,7 @@
 require("config/config.default.php");
 require("config/config.function.php");
 require("config/functions.crud.php");
+require("config/functions.ujian.php");
 $pg = @$_POST['pg'];
 $id_siswa = (isset($_SESSION['id_siswa'])) ? $_SESSION['id_siswa'] : 0;
 $id = @$_POST['id'];
@@ -33,6 +34,11 @@ $ac = $mapel[0]['id_ujian'];
     update($koneksi, 'nilai', array('ujian_berlangsung' => $datetime), $where2);
     $nilai = fetch($koneksi, 'nilai', $where2);
     if ($nilai['ujian_selesai'] <> null) {
+        jump("$homeurl");
+    }
+    $ujianaktif = fetch($koneksi, 'ujian', array('id_ujian' => $ac));
+    if ($ujianaktif && strtotime($nilai['ujian_mulai']) > 0 && (time() - strtotime($nilai['ujian_mulai'])) > ($ujianaktif['lama_ujian'] * 60)) {
+        selesaikanUjian($koneksi, $nilai['id_nilai'], $datetime, $tanggal, $waktu);
         jump("$homeurl");
     }
     $nomor = $_POST['no_soal'];
@@ -734,6 +740,26 @@ if ($pg == 'jawab') {
         }
         $jmlpelanggaran = mysqli_num_rows(mysqli_query($koneksi, "SELECT id_log FROM log WHERE id_siswa='$pelanggaransiswa' AND type='pelanggaran' AND date >= '$nilaiujian[ujian_mulai]'"));
         echo $jmlpelanggaran;
+    }
+} elseif ($pg == 'heartbeat') {
+    $hbsiswa = (isset($_SESSION['id_siswa'])) ? (int) $_SESSION['id_siswa'] : 0;
+    $hbujian = (int) @$_POST['id_ujian'];
+    $hbnilai = fetch($koneksi, 'nilai', array('id_siswa' => $hbsiswa, 'id_ujian' => $hbujian));
+    if ($hbnilai == null) {
+        echo '0';
+    } elseif ($hbnilai['ujian_selesai'] <> '') {
+        echo 'HABIS';
+    } else {
+        update($koneksi, 'nilai', array('ujian_berlangsung' => $datetime), array('id_siswa' => $hbsiswa, 'id_ujian' => $hbujian));
+        $hbujianrow = fetch($koneksi, 'ujian', array('id_ujian' => $hbujian));
+        $hblama = (int) $hbujianrow['lama_ujian'] * 60;
+        $hbmulai = strtotime($hbnilai['ujian_mulai']);
+        if ($hbmulai > 0 && (time() - $hbmulai) > $hblama) {
+            selesaikanUjian($koneksi, $hbnilai['id_nilai'], $datetime, $tanggal, $waktu);
+            echo 'HABIS';
+        } else {
+            echo ($hbmulai + $hblama) - time();
+        }
     }
 }
 ?>

@@ -764,7 +764,7 @@ $tglsekarang = time();
                     <?php
                     $ac = dekripsi($ac);
                     $id = dekripsi($id);
-                    $batas_pelanggaran = 5;
+                    $batas_pelanggaran = (isset($setting['batas_pelanggaran']) && $setting['batas_pelanggaran'] > 0) ? $setting['batas_pelanggaran'] : 5;
                     $jmlpelanggaran = 0;
                     $qcek = mysqli_query($koneksi, "select * from nilai where id_ujian='$ac' and id_siswa='$id'");
                     $cek = mysqli_num_rows($qcek);
@@ -928,11 +928,21 @@ $tglsekarang = time();
        
     </script>
     <?php if ($pg == 'testongoing') : ?>
+        <?php require('config/dis.php'); ?>
         <script>
             window.history.pushState(null, "", window.location.href);
             window.onpopstate = function() {
                 window.history.pushState(null, "", window.location.href);
             };
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+            });
+            document.addEventListener('cut', function(e) {
+                e.preventDefault();
+            });
+            document.addEventListener('paste', function(e) {
+                e.preventDefault();
+            });
             var homeurl;
             homeurl = '<?= $homeurl ?>';
             var pelanggaranujian = '<?= $ac ?>';
@@ -1029,6 +1039,33 @@ $tglsekarang = time();
                     ujianselesai = true;
                 }
             });
+            function kirimHeartbeat() {
+                if (ujianselesai) return;
+                $.ajax({
+                    type: 'POST',
+                    url: homeurl + '/soal.php',
+                    data: {
+                        pg: 'heartbeat',
+                        id_ujian: pelanggaranujian
+                    },
+                    success: function(response) {
+                        if ($.trim(response) == 'HABIS') {
+                            ujianselesai = true;
+                            swal({
+                                title: 'Waktu Ujian Habis',
+                                text: 'Waktu ujian telah berakhir. Ujian Anda ditutup otomatis.',
+                                type: 'warning',
+                                confirmButtonText: 'Mengerti',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            }).then(function() {
+                                location.href = homeurl + '/jadwal';
+                            });
+                        }
+                    }
+                });
+            }
+            setInterval(kirimHeartbeat, 30000);
             $(document).ready(function() {
                 if (jmlpelanggaran >= bataspelanggaran) {
                     akhiripelanggaran();
@@ -1314,91 +1351,125 @@ $tglsekarang = time();
                 }
             }
 
-            function jawabsoal(idmapel, idsiswa, idsoal, jawab, jawabQ, jenis, idu) {
-
-                //console.log(idmapel + '-' + idsiswa + '-' + idsoal + '-' + jawab + '-' + jawabQ + '-' + jenis + '-' + idu)
+            var kunciAntrean = 'antcbt_jawaban_pending_' + pelanggaranujian;
+            function ambilAntrean() {
+                try {
+                    return JSON.parse(localStorage.getItem(kunciAntrean)) || {};
+                } catch (e) {
+                    return {};
+                }
+            }
+            function simpanAntrean(antrean) {
+                localStorage.setItem(kunciAntrean, JSON.stringify(antrean));
+            }
+            function kirimJawabanAman(kunci, data, sukses) {
+                var antrean = ambilAntrean();
+                antrean[kunci] = data;
+                simpanAntrean(antrean);
                 $.ajax({
                     type: 'POST',
                     url: homeurl + '/soal.php',
-                    data: {
-                        pg: 'jawab',
-                        id_mapel: idmapel,
-                        id_siswa: idsiswa,
-                        id_soal: idsoal,
-                        jawaban: jawab,
-                        jenis: jenis,
-                        idu: idu,
-                        jawabx: jawabQ
-                    },
+                    data: data,
+                    timeout: 15000,
                     success: function(response) {
-                        //console.log(response);
-                        if (response == 'OK') {
-                            $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
-                            $('#nomorsoal #badge' + idsoal).removeClass('bg-yellow');
-                            $('#nomorsoal #badge' + idsoal).addClass('bg-green');
-                            $('#nomorsoal #jawabtemp' + idsoal).html(jawabQ);
-                            $('#ketjawab').load(window.location.href + ' #ketjawab');
+                        if ($.trim(response) == 'OK') {
+                            var a = ambilAntrean();
+                            delete a[kunci];
+                            simpanAntrean(a);
+                            if (sukses) sukses();
                         }
+                    },
+                    error: function() {
+                        toastr.warning('Koneksi bermasalah - jawaban disimpan sementara dan akan dikirim ulang');
                     }
+                });
+            }
+            function kirimAntreanTertunda() {
+                var antrean = ambilAntrean();
+                var kunciList = Object.keys(antrean);
+                if (kunciList.length == 0) return;
+                kunciList.forEach(function(kunci) {
+                    $.ajax({
+                        type: 'POST',
+                        url: homeurl + '/soal.php',
+                        data: antrean[kunci],
+                        timeout: 15000,
+                        success: function(response) {
+                            if ($.trim(response) == 'OK') {
+                                var a = ambilAntrean();
+                                delete a[kunci];
+                                simpanAntrean(a);
+                                if (Object.keys(ambilAntrean()).length == 0) {
+                                    toastr.success('Jawaban tertunda berhasil terkirim');
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+            setInterval(kirimAntreanTertunda, 15000);
+            window.addEventListener('online', kirimAntreanTertunda);
+            kirimAntreanTertunda();
+
+            function jawabsoal(idmapel, idsiswa, idsoal, jawab, jawabQ, jenis, idu) {
+
+                //console.log(idmapel + '-' + idsiswa + '-' + idsoal + '-' + jawab + '-' + jawabQ + '-' + jenis + '-' + idu)
+                kirimJawabanAman('jawab_' + jenis + '_' + idsoal, {
+                    pg: 'jawab',
+                    id_mapel: idmapel,
+                    id_siswa: idsiswa,
+                    id_soal: idsoal,
+                    jawaban: jawab,
+                    jenis: jenis,
+                    idu: idu,
+                    jawabx: jawabQ
+                }, function() {
+                    $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
+                    $('#nomorsoal #badge' + idsoal).removeClass('bg-yellow');
+                    $('#nomorsoal #badge' + idsoal).addClass('bg-green');
+                    $('#nomorsoal #jawabtemp' + idsoal).html(jawabQ);
+                    $('#ketjawab').load(window.location.href + ' #ketjawab');
                 });
             }
 
             function jawabesai(idmapel, idsiswa, idsoal, jenis) {
                 var jawab = $('#jawabesai').val();
-                $.ajax({
-                    type: 'POST',
-                    url: homeurl + '/soal.php',
-                    data: {
-                        pg: 'jawab',
-                        id_mapel: idmapel,
-                        id_siswa: idsiswa,
-                        id_soal: idsoal,
-                        jawaban: jawab,
-                        jenis: jenis,
-                        idu: <?= $ac ?>
-                    },
-                    success: function(response) {
-                        if (response == 'OK') {
-                            toastr.success("jawaban berhasil disimpan");
-                            $('#badge' + idsoal).removeClass('bg-gray');
-                            $('#badge' + idsoal).removeClass('bg-yellow');
-                            $('#badge' + idsoal).addClass('bg-green');
-                            $('#ketjawab').load(window.location.href + ' #ketjawab');
-                        }
-
-                    }
+                kirimJawabanAman('jawab_' + jenis + '_' + idsoal, {
+                    pg: 'jawab',
+                    id_mapel: idmapel,
+                    id_siswa: idsiswa,
+                    id_soal: idsoal,
+                    jawaban: jawab,
+                    jenis: jenis,
+                    idu: <?= $ac ?>
+                }, function() {
+                    toastr.success("jawaban berhasil disimpan");
+                    $('#badge' + idsoal).removeClass('bg-gray');
+                    $('#badge' + idsoal).removeClass('bg-yellow');
+                    $('#badge' + idsoal).addClass('bg-green');
+                    $('#ketjawab').load(window.location.href + ' #ketjawab');
                 });
             }
 
             function radaragu(idmapel, idsiswa, idsoal, idu) {
                 cekclass = $('#nomorsoal #badge' + idsoal).attr('class');
                 if (cekclass != 'btn btn-app bg-gray') {
-                    $.ajax({
-                        type: 'POST',
-                        url: homeurl + '/soal.php',
-                        data: {
-                            pg: 'ragu',
-                            id_mapel: idmapel,
-                            id_siswa: idsiswa,
-                            id_soal: idsoal,
-                            id_ujian: idu
-                        },
-                        success: function(response) {
-                            console.log(response);
-                            if (response == 'OK') {
-                                if (cekclass == 'btn btn-app bg-green') {
-                                    $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
-                                    $('#nomorsoal #badge' + idsoal).removeClass('bg-green');
-                                    $('#nomorsoal #badge' + idsoal).addClass('bg-yellow');
-                                    console.log('kuning');
-                                }
-                                if (cekclass == 'btn btn-app bg-yellow') {
-                                    $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
-                                    $('#nomorsoal #badge' + idsoal).removeClass('bg-yellow');
-                                    $('#nomorsoal #badge' + idsoal).addClass('bg-green');
-                                    console.log('hijau');
-                                }
-                            }
+                    kirimJawabanAman('ragu_' + idsoal, {
+                        pg: 'ragu',
+                        id_mapel: idmapel,
+                        id_siswa: idsiswa,
+                        id_soal: idsoal,
+                        id_ujian: idu
+                    }, function() {
+                        if (cekclass == 'btn btn-app bg-green') {
+                            $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
+                            $('#nomorsoal #badge' + idsoal).removeClass('bg-green');
+                            $('#nomorsoal #badge' + idsoal).addClass('bg-yellow');
+                        }
+                        if (cekclass == 'btn btn-app bg-yellow') {
+                            $('#nomorsoal #badge' + idsoal).removeClass('bg-gray');
+                            $('#nomorsoal #badge' + idsoal).removeClass('bg-yellow');
+                            $('#nomorsoal #badge' + idsoal).addClass('bg-green');
                         }
                     });
                 } else {

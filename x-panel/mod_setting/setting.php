@@ -137,6 +137,18 @@ $setting['header'] = str_replace('<br />', '', $setting['header']);
                                     <div class='form-group'>
                                         <div class='row'>
                                             <div class='col-md-6'>
+                                                <label>Batas Pelanggaran Pindah Tab</label>
+                                                <input type='number' name='batas_pelanggaran' value="<?= $setting['batas_pelanggaran'] ?>" class='form-control' min='1' required='true' />
+                                            </div>
+                                            <div class='col-md-6'>
+                                                <label>Refresh Status Peserta (detik)</label>
+                                                <input type='number' name='refresh_status' value="<?= $setting['refresh_status'] ?>" class='form-control' min='1' required='true' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='form-group'>
+                                        <div class='row'>
+                                            <div class='col-md-6'>
                                                 <label>Logo</label>
                                                 <input type='file' name='logo' class='form-control' />
                                             </div>
