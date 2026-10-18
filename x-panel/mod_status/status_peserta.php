@@ -131,22 +131,22 @@ if ($ac == '') : ?>
         kirimAksiMassal('ulangujian', 'Apa anda yakin?', 'Akan mengulang %d ujian terpilih?');
     });
 
-    var refreshStatusInterval = <?= $setting_refresh ?> * 1000;
-    var autoRefresh = null;
+    var intervalStatusUjian = <?= $setting_refresh ?> * 1000;
+    var timerStatusUjian = null;
 
     function muatStatus() {
         $('#divstatus').load("mod_status/statusall.php", pulihkanCeklis);
     }
 
     function mulaiRefreshStatus() {
-        if (autoRefresh) return;
-        autoRefresh = setInterval(muatStatus, refreshStatusInterval);
+        if (timerStatusUjian) return;
+        timerStatusUjian = setInterval(muatStatus, intervalStatusUjian);
     }
 
     function hentikanRefreshStatus() {
-        if (autoRefresh) {
-            clearInterval(autoRefresh);
-            autoRefresh = null;
+        if (timerStatusUjian) {
+            clearInterval(timerStatusUjian);
+            timerStatusUjian = null;
         }
     }
 
