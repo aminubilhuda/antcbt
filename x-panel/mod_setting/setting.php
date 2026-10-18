@@ -138,7 +138,8 @@ $setting['header'] = str_replace('<br />', '', $setting['header']);
                                         <div class='row'>
                                             <div class='col-md-6'>
                                                 <label>Batas Pelanggaran Pindah Tab</label>
-                                                <input type='number' name='batas_pelanggaran' value="<?= $setting['batas_pelanggaran'] ?>" class='form-control' min='1' required='true' />
+                                                <input type='number' name='batas_pelanggaran' value="<?= $setting['batas_pelanggaran'] ?>" class='form-control' min='0' required='true' />
+                                                <small class='form-text text-muted'>Isi 0 untuk menonaktifkan pencatatan pelanggaran pindah tab.</small>
                                             </div>
                                             <div class='col-md-6'>
                                                 <label>Refresh Status Peserta (detik)</label>

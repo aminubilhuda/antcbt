@@ -726,8 +726,10 @@ if ($pg == 'jawab') {
     $pelanggaransiswa = (isset($_SESSION['id_siswa'])) ? (int) $_SESSION['id_siswa'] : 0;
     $pelanggaranujian = (int) @$_POST['id_ujian'];
     $pelanggaranmode = (isset($_POST['mode']) && $_POST['mode'] == 'cek') ? 'cek' : 'catat';
+    $pengaturan = fetch($koneksi, 'setting', array('id_setting' => 1));
+    $batasviolasi = (isset($pengaturan['batas_pelanggaran']) && is_numeric($pengaturan['batas_pelanggaran']) && $pengaturan['batas_pelanggaran'] >= 0) ? (int) $pengaturan['batas_pelanggaran'] : 5;
     $nilaiujian = fetch($koneksi, 'nilai', array('id_siswa' => $pelanggaransiswa, 'id_ujian' => $pelanggaranujian));
-    if ($nilaiujian == null) {
+    if ($nilaiujian == null || $batasviolasi <= 0) {
         echo 0;
     } else {
         if ($pelanggaranmode == 'catat' && ($nilaiujian['ujian_selesai'] == null || $nilaiujian['ujian_selesai'] == '')) {

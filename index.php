@@ -764,7 +764,7 @@ $tglsekarang = time();
                     <?php
                     $ac = dekripsi($ac);
                     $id = dekripsi($id);
-                    $batas_pelanggaran = (isset($setting['batas_pelanggaran']) && $setting['batas_pelanggaran'] > 0) ? $setting['batas_pelanggaran'] : 5;
+                    $batas_pelanggaran = (isset($setting['batas_pelanggaran']) && is_numeric($setting['batas_pelanggaran']) && $setting['batas_pelanggaran'] >= 0) ? (int) $setting['batas_pelanggaran'] : 5;
                     $jmlpelanggaran = 0;
                     $qcek = mysqli_query($koneksi, "select * from nilai where id_ujian='$ac' and id_siswa='$id'");
                     $cek = mysqli_num_rows($qcek);
@@ -947,13 +947,14 @@ $tglsekarang = time();
             homeurl = '<?= $homeurl ?>';
             var pelanggaranujian = '<?= $ac ?>';
             var bataspelanggaran = <?= $batas_pelanggaran ?>;
+            var pelanggaranaktif = bataspelanggaran > 0;
             var jmlpelanggaran = <?= $jmlpelanggaran ?>;
             var pelanggaranpending = false;
             var pelanggaranakhir = false;
             var ujianselesai = false;
             var judulujian = document.title;
             function tampilkanperingatan() {
-                if (pelanggaranakhir) return;
+                if (pelanggaranakhir || !pelanggaranaktif) return;
                 swal({
                     title: 'Peringatan!',
                     html: 'Anda terdeteksi meninggalkan halaman ujian.<br>Pelanggaran ke-<b>' + jmlpelanggaran + '</b> dari ' + bataspelanggaran + '.<br>Jika mencapai ' + bataspelanggaran + ' kali, ujian akan diakhiri otomatis.',
@@ -966,6 +967,7 @@ $tglsekarang = time();
                 });
             }
             function sinkronpelanggaran() {
+                if (!pelanggaranaktif) return;
                 $.ajax({
                     type: 'POST',
                     url: homeurl + '/soal.php',
@@ -987,7 +989,7 @@ $tglsekarang = time();
                 });
             }
             function akhiripelanggaran() {
-                if (pelanggaranakhir) return;
+                if (pelanggaranakhir || !pelanggaranaktif) return;
                 pelanggaranakhir = true;
                 swal({
                     title: 'Ujian Diakhiri',
@@ -1003,7 +1005,7 @@ $tglsekarang = time();
                 });
             }
             document.addEventListener('visibilitychange', function() {
-                if (ujianselesai) return;
+                if (ujianselesai || !pelanggaranaktif) return;
                 if (document.hidden) {
                     pelanggaranpending = true;
                     jmlpelanggaran++;
@@ -1067,7 +1069,9 @@ $tglsekarang = time();
             }
             setInterval(kirimHeartbeat, 30000);
             $(document).ready(function() {
-                if (jmlpelanggaran >= bataspelanggaran) {
+                if (!pelanggaranaktif) {
+                    jmlpelanggaran = 0;
+                } else if (jmlpelanggaran >= bataspelanggaran) {
                     akhiripelanggaran();
                 } else if (jmlpelanggaran > 0) {
                     tampilkanperingatan();

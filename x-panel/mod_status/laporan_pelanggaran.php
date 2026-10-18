@@ -3,6 +3,8 @@ cek_session_guru();
 $pengawas = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM pengawas WHERE id_pengawas='$_SESSION[id_pengawas]'"));
 $filterguru = ($pengawas['level'] == 'admin') ? '' : " AND c.id_guru='$_SESSION[id_pengawas]'";
 $idu = isset($_GET['idu']) ? (int) $_GET['idu'] : 0;
+$settinglap = fetch($koneksi, 'setting', array('id_setting' => 1));
+$bataslap = (isset($settinglap['batas_pelanggaran']) && is_numeric($settinglap['batas_pelanggaran']) && $settinglap['batas_pelanggaran'] >= 0) ? (int) $settinglap['batas_pelanggaran'] : 5;
 $ujianQ = mysqli_query($koneksi, "SELECT c.id_ujian, c.kode_ujian, c.nama, c.tgl_ujian FROM ujian c WHERE c.status='1' $filterguru ORDER BY c.id_ujian DESC LIMIT 100");
 ?>
 <div class='row'>
@@ -31,6 +33,9 @@ $ujianQ = mysqli_query($koneksi, "SELECT c.id_ujian, c.kode_ujian, c.nama, c.tgl
                     $total = mysqli_num_rows($dataQ);
                     ?>
                     <div class='alert alert-info'>Ujian: <b><?= $ujian['kode_ujian'] ?> - <?= $ujian['nama'] ?></b> | Jumlah siswa melanggar: <b><?= $total ?></b></div>
+                    <?php if ($bataslap <= 0) : ?>
+                        <div class='alert alert-warning'><i class='fa fa-info-circle'></i> Pelanggaran pindah tab sedang <b>dinonaktifkan</b> (Pengaturan: Batas Pelanggaran = 0). Pelanggaran baru tidak lagi dicatat; data di bawah ini adalah riwayat sebelum dinonaktifkan.</div>
+                    <?php endif; ?>
                     <div class='table-responsive'>
                         <table class='table table-bordered table-striped'>
                             <thead>
