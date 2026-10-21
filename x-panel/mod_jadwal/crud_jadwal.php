@@ -66,7 +66,7 @@ if ($pg == 'tambah') {
             'kode_ujian'        => $_POST['kode_ujian'],
             'kkm'        => $bank['kkm'],
             'ulang'        => $acakopsi,
-            'soal_agama'        => $bank['agama'],
+            'soal_agama'        => $bank['soal_agama'],
             'kode_nama'        => $bank['kode'],
             'reset'        => $reset,
             'waktuselesai' => $_POST['waktuselesai']
@@ -94,6 +94,9 @@ if ($pg == 'tambahsusulan') {
     $acakopsi = (isset($_POST['acakopsi'])) ? 1 : 0;
     $reset = (isset($_POST['reset'])) ? 1 : 0;
     
+    $dibuat = 0;
+    $sudahada = 0;
+    $gagal = '';
     $mapel = mysqli_query($koneksi, "SELECT * FROM mapel WHERE status = '1'");
     while ($bank = mysqli_fetch_assoc($mapel)) {
         $data = [
@@ -122,23 +125,24 @@ if ($pg == 'tambahsusulan') {
             'kode_ujian'        => $_POST['kode_ujian'],
             'kkm'        => $bank['kkm'],
             'ulang'        => $acakopsi,
-            'soal_agama'        => $bank['agama'],
+            'soal_agama'        => $bank['soal_agama'],
             'kode_nama'        => $bank['kode'],
             'reset'        => $reset,
             'waktuselesai' => $_POST['waktuselesai']
         ];
         $cek = rowcount($koneksi, 'ujian', ['kode_nama' => $bank['kode'], 'sesi' => $_POST['sesi']]);
         if ($cek > 0) {
-            echo "jadwal sudah ada";
+            $sudahada++;
         } else {
             $exec = insert($koneksi, 'ujian', $data);
+            if ($exec) {
+                $dibuat++;
+            } else {
+                $gagal = mysqli_error($koneksi);
+            }
         }
     }
-    if ($exec) {
-        echo $exec;
-    } else {
-        echo mysqli_error($koneksi);
-    }
+    echo json_encode(['dibuat' => $dibuat, 'sudahada' => $sudahada, 'gagal' => $gagal]);
 }
 if ($pg == 'aktivasi') {
     foreach ($_POST['ujian'] as $ujian) {

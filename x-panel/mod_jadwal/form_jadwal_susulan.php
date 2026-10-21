@@ -48,14 +48,14 @@
                         <div class='col-md-4'>
                             <div class='form-group'>
                                 <label>Lama ujian (menit)</label>
-                                <input type='number' name='lama_ujian' class='form-control' required='true' id="lamaujian-tambah" />
+                                <input type='number' name='lama_ujian' class='form-control' required='true' id="lamaujian-susulan" />
                             </div>
                         </div>
                         <div class='col-md-4'>
                             <div class='form-group'>
                                 <label>Waktu selesai (menit)</label>
                                 <i class="fas fa-question-circle text-primary"  data-toggle="tooltip" data-placement="top" title="Waktu untuk tombol selesai bisa diklik"></i>
-                                <input type='number' name='waktuselesai' class='form-control' id="waktuselesai-tambah" />
+                                <input type='number' name='waktuselesai' class='form-control' id="waktuselesai-susulan" />
                             </div>
                         </div>
                     </div>

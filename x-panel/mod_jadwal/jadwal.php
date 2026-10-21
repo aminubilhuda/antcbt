@@ -523,7 +523,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
         $('#formtambahujian').submit(function(e) {
             e.preventDefault();
 
-            if ($('#waktuselesai-tambah').val() > $('#lamaujian-tambah').val()) {
+            if (parseInt($('#waktuselesai-tambah').val(), 10) > parseInt($('#lamaujian-tambah').val(), 10)) {
                 iziToast.error({
                     title: 'Peringatan!',
                     message: 'Waktu selesai tidak boleh lebih dari waktu ujian',
@@ -598,13 +598,13 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
         $('#formtambahujiansusulan').submit(function(e) {
             e.preventDefault();
 
-            if ($('#waktuselesai-tambah').val() > $('#lamaujian-tambah').val()) {
+            if (parseInt($('#waktuselesai-susulan').val(), 10) > parseInt($('#lamaujian-susulan').val(), 10)) {
                 iziToast.error({
                     title: 'Peringatan!',
                     message: 'Waktu selesai tidak boleh lebih dari waktu ujian',
                     position: 'topRight'
                 });
-                $('#waktuselesai-tambah').focus();
+                $('#waktuselesai-susulan').focus();
                 return false;
             }
 
@@ -615,19 +615,41 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
 
                 success: function(data) {
                     console.log(data);
-                    if (data == 'OK') {
+                    var res;
+                    var jsonStart = data.indexOf('{');
+                    try {
+                        res = JSON.parse(jsonStart >= 0 ? data.substring(jsonStart) : data);
+                    } catch (err) {
+                        console.log('Response:', data);
+                        iziToast.error({
+                            title: 'Maaf!',
+                            message: 'Format response tidak valid',
+                            position: 'topRight'
+                        });
+                        return;
+                    }
+                    if (res.gagal) {
+                        iziToast.error({
+                            title: 'Gagal!',
+                            message: res.gagal,
+                            position: 'topRight'
+                        });
+                        return;
+                    }
+                    var ringkasan = res.dibuat + ' jadwal dibuat, ' + res.sudahada + ' sudah ada';
+                    if (res.dibuat > 0) {
                         iziToast.success({
                             title: 'Mantap!',
-                            message: 'data berhasil disimpan',
+                            message: ringkasan,
                             position: 'topRight'
                         });
                         setTimeout(function() {
                             window.location.reload();
                         }, 2000);
                     } else {
-                        iziToast.error({
+                        iziToast.warning({
                             title: 'Maaf!',
-                            message: data,
+                            message: 'Tidak ada jadwal baru (' + ringkasan + ')',
                             position: 'topRight'
                         });
                     }
