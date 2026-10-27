@@ -67,8 +67,13 @@ for ($i = 1; $i <= $mapel['jml_esai']; $i++) {
 
 $sheet->getColumnDimension('C')->setAutoSize(true);
 
+// Kolom terakhir tabel = 8 kolom tetap (A-H) + kolom PG + kolom Esai
+$lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+    8 + (int) $mapel['jml_soal'] + (int) $mapel['jml_esai']
+);
+
 // Atur gaya header tabel
-$sheet->getStyle('A9:' . $columnIndex . '9')->applyFromArray([
+$sheet->getStyle('A9:' . $lastColLetter . '9')->applyFromArray([
     'font' => [
         'bold' => true,
         'color' => ['argb' => 'FFFFFF'],
@@ -165,11 +170,11 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
             }
         }
     } else {
-        $sheet->setCellValue('E' . $row, 'Tidak mengikuti ujian')->mergeCells('E' . $row . ':' . $columnIndex . $row);
+        $sheet->setCellValue('E' . $row, 'Tidak mengikuti ujian')->mergeCells('E' . $row . ':' . $lastColLetter . $row);
     }
 
     // Terapkan border untuk baris saat ini
-    $sheet->getStyle('A' . $row . ':' . $columnIndex . $row)->applyFromArray([
+    $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray([
         'borders' => [
             'allBorders' => [
                 'borderStyle' => Border::BORDER_THIN,
@@ -182,7 +187,7 @@ while ($siswa = mysqli_fetch_assoc($siswaQ)) {
 }
 
 // Menambahkan border ke seluruh tabel (termasuk header)
-$lastColumn = chr(ord('A') + 7 + $mapel['jml_soal'] + $mapel['jml_esai']); // Hitung kolom terakhir (jumlah soal pg + jumlah soal esai + 8 kolom tetap - 1)
+$lastColumn = $lastColLetter; // Kolom terakhir (chr() hanya muat 1 byte, error untuk kolom > 26)
 $lastRow = $row - 1;
 
 $sheet->getStyle('A9:' . $lastColumn . $lastRow)->applyFromArray([
