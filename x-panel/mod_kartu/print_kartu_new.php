@@ -147,13 +147,15 @@ body {
 
 .info-row {
     display: flex;
-    margin-bottom: 1px;
+    align-items: baseline;
+    margin-bottom: 3px;
 }
 
 .label {
     width: 56px;
     flex-shrink: 0;
     font-size: 9px;
+    line-height: 1.3;
     color: #555;
 }
 
@@ -161,10 +163,13 @@ body {
     flex: 1;
     min-width: 0;
     font-size: 9px;
+    line-height: 1.3;
     color: #222;
 }
 
 .name-clamp {
+    font-size: 11px;
+    line-height: 1.25;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -173,11 +178,15 @@ body {
 }
 
 .credentials-box {
-    margin-top: 2px;
-    padding: 2px 5px;
+    margin-top: 3px;
+    padding: 3px 5px;
     background: #e3f2fd;
     border-radius: 4px;
     border-left: 3px solid #2196F3;
+}
+
+.credentials-box .info-row:last-child {
+    margin-bottom: 0;
 }
 
 .qr-container {
