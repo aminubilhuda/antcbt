@@ -81,15 +81,16 @@ echo "
 													<tbody>";
 $nilaix = mysqli_query($koneksi, "SELECT * FROM hasil_jawaban WHERE id_siswa='$id_siswa' and id_mapel='$id_mapel' and jenis='2' ");
 while ($jawaban = mysqli_fetch_array($nilaix)) {
-	$soal = mysqli_fetch_array(mysqli_query($koneksi, "select * from soal where id_soal='$jawabane[id_soal]'  "));
+	$soal = mysqli_fetch_array(mysqli_query($koneksi, "select * from soal where id_soal='$jawaban[id_soal]'  "));
 	$nox++;
-
+	$soal_html = format_soal_html($soal['soal']);
+	$jawab_esai_html = format_jawaban_esai($jawaban['esai']);
 
 	echo "
 																		<tr><td>$nox</td>
 																			
-																			<td>$soal[soal]
-																			<p><b>jawab : </b>$jawaban[esai]</p>
+																			<td>$soal_html
+																			<div style='margin-top:6px;'><b>Jawab :</b>$jawab_esai_html</div>
 																			</td>
 																		    
 																			<td style='text-align:center'>$jawaban[nilai_esai]</td>	

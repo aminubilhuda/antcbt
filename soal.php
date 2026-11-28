@@ -52,7 +52,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
   <div class='row'>
     <div class='col-md-12'>
       <div class='callout soal'>
-        <div class='soaltanya animated fadeIn'><?= $soal['soal'] ?></div>
+        <div class='soaltanya animated fadeIn'><?= format_soal_html($soal['soal']) ?></div>
       </div>
       <div class='col-md-12'>
         <?php
@@ -207,7 +207,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal[$pilAA] ?></span>
+            <span class='soal'><?= format_soal_html($soal[$pilAA]) ?></span>
             <?php if ($soal[$fileAA] <> '') : ?>
             <?php
                                                     $ext = explode(".", $soal[$fileAA]);
@@ -234,7 +234,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal[$pilBB] ?></span>
+            <span class='soal'><?= format_soal_html($soal[$pilBB]) ?></span>
             <?php
                                                 if ($soal[$fileBB] <> '') {
                                                     $ext = explode(".", $soal[$fileBB]);
@@ -261,7 +261,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal[$pilCC] ?></span>
+            <span class='soal'><?= format_soal_html($soal[$pilCC]) ?></span>
             <?php
                                                 if ($soal[$fileCC] <> '') {
                                                     $ext = explode(".", $soal[$fileCC]);
@@ -288,7 +288,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal[$pilDD] ?></span>
+            <span class='soal'><?= format_soal_html($soal[$pilDD]) ?></span>
             <?php
                                                     if ($soal[$fileDD] <> '') {
                                                         $ext = explode(".", $soal[$fileDD]);
@@ -316,7 +316,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal[$pilEE] ?></span>
+            <span class='soal'><?= format_soal_html($soal[$pilEE]) ?></span>
             <?php
                                                     if ($soal[$fileEE] <> '') {
                                                         $ext = explode(".", $soal[$fileEE]);
@@ -359,7 +359,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal['pilA'] ?></span>
+            <span class='soal'><?= format_soal_html($soal['pilA']) ?></span>
             <?php
                                             if ($soal['fileA'] <> '') {
                                                 $ext = explode(".", $soal['fileA']);
@@ -385,7 +385,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal['pilB'] ?></span>
+            <span class='soal'><?= format_soal_html($soal['pilB']) ?></span>
             <?php
                                             if ($soal['fileB'] <> '') {
                                                 $ext = explode(".", $soal['fileB']);
@@ -412,7 +412,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
 
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal['pilC'] ?></span>
+            <span class='soal'><?= format_soal_html($soal['pilC']) ?></span>
             <?php
                                             if ($soal['fileC'] <> '') {
                                                 $ext = explode(".", $soal['fileC']);
@@ -439,7 +439,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal['pilD'] ?></span>
+            <span class='soal'><?= format_soal_html($soal['pilD']) ?></span>
             <?php
                                                 if ($soal['fileD'] <> '') {
                                                     $ext = explode(".", $soal['fileD']);
@@ -467,7 +467,7 @@ if(empty($jawab)) $jawab = ['jawabx' => '', 'ragu' => 0, 'esai' => ''];
             </label>
           </td>
           <td style='vertical-align:middle;'>
-            <span class='soal'><?= $soal['pilE'] ?></span>
+            <span class='soal'><?= format_soal_html($soal['pilE']) ?></span>
             <?php
                                                 if ($soal['fileE'] <> '') {
 
@@ -700,10 +700,22 @@ if ($pg == 'jawab') {
             $exec = update($koneksi, 'jawaban', $data, $where);
         }
     } else {
+        $idu_val = (int) $_POST['idu'];
+        $idm_val = (int) $_POST['id_mapel'];
+        $ids_val = (int) $_POST['id_siswa'];
+        $idsoal_val = (int) $_POST['id_soal'];
+        $jns_val = (int) $jenis;
+        $esai_val = isset($_POST['jawaban']) ? (string) $_POST['jawaban'] : '';
         if ($cekjawaban == 0) {
-            $exec = insert($koneksi, 'jawaban', $dataesai);
+            $stmt_e = mysqli_prepare($koneksi, "INSERT INTO jawaban (id_ujian, id_mapel, id_siswa, id_soal, jenis, esai) VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_e, 'iiiiis', $idu_val, $idm_val, $ids_val, $idsoal_val, $jns_val, $esai_val);
+            $exec = mysqli_stmt_execute($stmt_e) ? 'OK' : 'NO';
+            mysqli_stmt_close($stmt_e);
         } else {
-            $exec = update($koneksi, 'jawaban', $dataesai, $where);
+            $stmt_e = mysqli_prepare($koneksi, "UPDATE jawaban SET esai=? WHERE id_ujian=? AND id_mapel=? AND id_siswa=? AND id_soal=? AND jenis=?");
+            mysqli_stmt_bind_param($stmt_e, 'siiiii', $esai_val, $idu_val, $idm_val, $ids_val, $idsoal_val, $jns_val);
+            $exec = mysqli_stmt_execute($stmt_e) ? 'OK' : 'NO';
+            mysqli_stmt_close($stmt_e);
         }
     }
     echo $exec;

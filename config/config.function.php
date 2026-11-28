@@ -491,3 +491,59 @@ function terbilang($nilai) {
 	}     		
 	return $hasil;
 }
+
+function format_soal_html($html) {
+	if ($html === null || $html === '') {
+		return '';
+	}
+	$str = (string) $html;
+	// Perbaiki double-escaped apostrophe dari impor lama
+	$str = str_replace(['&amp;apos;', '&apos;'], '&#39;', $str);
+
+	// Escape PHP open/close tags dan DOCTYPE agar tampil sebagai teks
+	$str = str_replace(['<?php', '<?=', '?>'], ['&lt;?php', '&lt;?=', '?&gt;'], $str);
+	$str = preg_replace_callback('/<!DOCTYPE[^>]*>/i', function ($m) {
+		return htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+	}, $str);
+
+	// Escape tag berspasi seperti < h1 >, < p >, < /html >
+	$str = preg_replace_callback('/<\s+\/?[a-zA-Z][a-zA-Z0-9-]*\s*[^>]*>/', function ($m) {
+		return htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+	}, $str);
+
+	// Escape tag struktur dokumen / form / script / style / tag non-konten
+	$docTags = 'html|head|body|title|meta|link|script|style|header|footer|nav|section|article|aside|main|form|input|button|select|option|textarea|label|iframe|image|pic|image-source|list';
+	$str = preg_replace_callback('/<\/?(?:' . $docTags . ')(?:\s[^>]*)?\/?>/i', function ($m) {
+		return htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+	}, $str);
+
+	// Escape <img> yang tidak punya atribut src= (misal soal menanyakan tag <img>)
+	$str = preg_replace_callback('/<img(?:\s+[^>]*)?\/?>/i', function ($m) {
+		if (stripos($m[0], 'src=') !== false) {
+			return $m[0];
+		}
+		return htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+	}, $str);
+
+	// Escape tag konten tunggal yang tidak punya pasangan penutup (misal opsi A: <p>, B: <h1>, C: <a>, D: <ul>)
+	$pairTags = ['p', 'div', 'span', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'table', 'tr', 'td', 'th'];
+	foreach ($pairTags as $tag) {
+		$hasClose = (bool) preg_match('/<\/' . $tag . '\s*>/i', $str);
+		if (!$hasClose) {
+			$str = preg_replace_callback('/<' . $tag . '(?:\s+[^>]*)?\/?>/i', function ($m) {
+				return htmlspecialchars($m[0], ENT_NOQUOTES, 'UTF-8');
+			}, $str);
+		}
+	}
+
+	return $str;
+}
+
+function format_jawaban_esai($text) {
+	if ($text === null || trim((string) $text) === '') {
+		return '<div style="color:#888; font-style:italic; margin-top:4px;">(Tidak dijawab)</div>';
+	}
+	$clean = str_replace(["\r\n", "\r"], "\n", (string) $text);
+	$escaped = htmlspecialchars($clean, ENT_QUOTES, 'UTF-8');
+	return '<div class="jawaban-esai-box" style="white-space:pre-wrap; word-break:break-word; background:#f8fafc; border:1px solid #dce3ea; border-radius:4px; padding:8px 10px; margin-top:4px; line-height:1.5;">' . $escaped . '</div>';
+}

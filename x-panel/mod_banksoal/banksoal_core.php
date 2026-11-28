@@ -710,6 +710,7 @@ if ($ac == '') :
                 <div class='box-header with-border '>
                     <h3 class='box-title'>Daftar Soal <?= $namamapel['nama'] ?></h3>
                     <div class='box-tools pull-right '>
+                        <a href='?pg=<?= $pg ?>' class='btn btn-sm btn-flat btn-default'><i class='fa fa-arrow-left'></i><span class='hidden-xs'> Kembali</span></a>
                         <a href='?pg=<?= $pg ?>&ac=input&id=<?= $id_mapel ?>&no=1&jenis=1' class='btn btn-sm btn-flat btn-success <?= $hidex ?>'><i class='fa fa-plus'></i><span class='hidden-xs'> Tambah</span> PG</a>
                         <?php if (!$banksoal_nonaktif) : ?>
                         <a href='?pg=<?= $pg ?>&ac=importsoal&id=<?= $id_mapel ?>' class='btn btn-info btn-flat btn-sm'><i class='fa fa-upload'></i> Import</a>
@@ -758,7 +759,7 @@ if ($ac == '') :
                                                         ?>
                                                         <?php
                                                         $v_soal = str_replace('<img src="../../files','<img src="../files',$soal['soal']);
-                                                        echo $v_soal;
+                                                        echo format_soal_html($v_soal);
                                                         ?>
                                                         <?php
                                                         if ($soal['file1'] <> '') :
@@ -782,7 +783,7 @@ if ($ac == '') :
                                                                     <?php
                                                                     if ($soal['pilA'] <> '') {
                                                                         $va = str_replace('<img src="../../files','<img src="../files',$soal['pilA']);
-                                                                        echo $va;
+                                                                        echo format_soal_html($va);
                                                                     }
 
                                                                     if ($soal['fileA'] <> '') {
@@ -805,7 +806,7 @@ if ($ac == '') :
                                                                     <?php
                                                                     if (!$soal['pilC'] == "") {
                                                                         $vc = str_replace('<img src="../../files','<img src="../files',$soal['pilC']);
-                                                                        echo $vc;
+                                                                        echo format_soal_html($vc);
                                                                     }
 
                                                                     if ($soal['fileC'] <> '') {
@@ -829,7 +830,7 @@ if ($ac == '') :
                                                                         <?php
                                                                         if (!$soal['pilE'] == "") {
                                                                             $ve = str_replace('<img src="../../files','<img src="../files',$soal['pilE']);
-                                                                            echo $ve;
+                                                                            echo format_soal_html($ve);
                                                                         }
 
                                                                         if ($soal['fileE'] <> '') {
@@ -857,7 +858,7 @@ if ($ac == '') :
                                                                     <?php
                                                                     if (!$soal['pilB'] == "") {
                                                                         $vb = str_replace('<img src="../../files','<img src="../files',$soal['pilB']);
-                                                                        echo $vb;
+                                                                        echo format_soal_html($vb);
                                                                     }
 
                                                                     if ($soal['fileB'] <> '') {
@@ -881,7 +882,7 @@ if ($ac == '') :
                                                                         <?php
                                                                         if (!$soal['pilD'] == "") {
                                                                             $vd = str_replace('<img src="../../files','<img src="../files',$soal['pilD']);
-                                                                            echo $vd;
+                                                                            echo format_soal_html($vd);
                                                                         }
 
                                                                         if ($soal['fileD'] <> '') {
@@ -974,7 +975,7 @@ if ($ac == '') :
                                 
                                                         <?php
                                                         $v_soal = str_replace('<img src="../../files','<img src="../files',$soal['soal']);
-                                                        echo $v_soal;
+                                                        echo format_soal_html($v_soal);
                                                         ?>
                                                         <?php
                                                         if ($soal['file1'] <> '') :

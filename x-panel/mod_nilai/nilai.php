@@ -114,7 +114,7 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
 
 													<!-- Modal -->
 													<div class="modal fade" id="modelId<?= $nilai['id_nilai'] ?>" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-														<div class="modal-dialog" role="document">
+														<div class="modal-dialog modal-lg" role="document">
 															<div class="modal-content">
 																<div class="modal-header">
 																	<h5 class="modal-title">JAWABAN ESAI</h5>
@@ -123,7 +123,13 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
 																<div class="modal-body">
 																	<form id='formnesai<?= $nilai['id_nilai'] ?>'>
 																		<table class='table table-bordered table-striped'>
-
+																			<thead>
+																				<tr>
+																					<th style="width:35px">#</th>
+																					<th>Soal &amp; Jawaban Siswa</th>
+																					<th style="width:90px; text-align:center;">Nilai</th>
+																				</tr>
+																			</thead>
 																			<tbody>
 																				<?php $noX = 0;
 																				$jawabanesai = unserialize($nilai['jawaban_esai']);
@@ -136,12 +142,13 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
 																					?>
 																					<tr>
 																						<td><?= $noX ?></td>
-																						<td><?= $soal['soal'] ?>
-																							<p><b>JAWAB :</b> <?= $value2 ?></p>
-																						</td>
 																						<td>
+																							<div><?= format_soal_html($soal['soal']) ?></div>
+																							<div style="margin-top:8px;"><b>JAWAB :</b><?= format_jawaban_esai($value2) ?></div>
+																						</td>
+																						<td style="text-align:center; vertical-align:middle;">
 																							<input type="hidden" class="form-control" name="id" value="<?= $nilai['id_nilai'] ?>">
-																							<input style="width: 50px" type="text" class="form-control" name="nesai<?= $nilai['id_nilai'] ?>[<?= $key2 ?>]" value="<?= $nesai[$key2] ?>">
+																							<input style="width: 70px; margin: 0 auto; text-align: center;" type="text" class="form-control" name="nesai<?= $nilai['id_nilai'] ?>[<?= $key2 ?>]" value="<?= isset($nesai[$key2]) ? $nesai[$key2] : '' ?>">
 																						</td>
 																					</tr>
 																				<?php endforeach; ?>
@@ -292,8 +299,8 @@ defined('APLIKASI') or exit('Anda tidak dizinkan mengakses langsung script ini!'
 										?>
 										<tr>
 											<td><?= $noX ?></td>
-											<td><?= $soal['soal'] ?></td>
-											<td><?= $value2 ?></td>
+											<td><?= format_soal_html($soal['soal']) ?></td>
+											<td><?= format_jawaban_esai($value2) ?></td>
 
 										</tr>
 									<?php endforeach; ?>

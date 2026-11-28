@@ -41,6 +41,26 @@ $tglsekarang = time();
         @font-face {
             font-family: 'tulisan_keren';
             src: url('<?= $homeurl ?>/dist/fonts/poppins/Poppins-Light.ttf');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'tulisan_keren';
+            src: url('<?= $homeurl ?>/dist/fonts/poppins/Poppins-LightItalic.ttf');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'tulisan_keren';
+            src: url('<?= $homeurl ?>/dist/fonts/poppins/Poppins-Bold.ttf');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'tulisan_keren';
+            src: url('<?= $homeurl ?>/dist/fonts/poppins/Poppins-BoldItalic.ttf');
+            font-weight: 700;
+            font-style: italic;
         }
         body {
             font-family: 'tulisan_keren';

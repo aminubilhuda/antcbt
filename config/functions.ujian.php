@@ -31,9 +31,7 @@ function selesaikanUjian($koneksi, $idnilai, $datetime, $tanggal, $waktu)
 
         $getjwb2 = fetch($koneksi, 'jawaban', $w2);
         if ($getjwb2) {
-            $jawabxx = str_replace("'", "`", $getjwb2['esai']);
-            $jawabxx = str_replace("#", ">>", $jawabxx);
-            $jawabxx = preg_replace('/[^A-Za-z0-9\@\<\>\$\_\&\-\+\(\)\/\?\!\;\:\`\"\[\]\*\{\}\=\%\~\`\÷\× ]/', '', $jawabxx);
+            $jawabxx = str_replace(["\r\n", "\r"], "\n", (string) $getjwb2['esai']);
             $arrayjawabesai[$getsoalesai['id_soal']] = $jawabxx;
         } else {
             $arrayjawabesai[$getsoalesai['id_soal']] = 'Tidak Diisi';
@@ -58,17 +56,13 @@ function selesaikanUjian($koneksi, $idnilai, $datetime, $tanggal, $waktu)
     $bagi = ($mapel['tampil_pg'] > 0) ? $mapel['tampil_pg'] / 100 : 1;
     $bobot = $mapel['bobot_pg'] / 100;
     $skor = ($benar / $bagi) * $bobot;
-    $data = array(
-        'ujian_selesai' => $datetime,
-        'jml_benar' => $benar,
-        'jml_salah' => $mapel['tampil_pg'] - $benar,
-        'skor' => $skor,
-        'total' => $skor,
-        'online' => 0,
-        'jawaban' => serialize($arrayjawab),
-        'jawaban_esai' => serialize($arrayjawabesai)
-    );
-    update($koneksi, 'nilai', $data, $where);
+    $jml_salah = $mapel['tampil_pg'] - $benar;
+    $ser_jawab = serialize($arrayjawab);
+    $ser_jawabesai = serialize($arrayjawabesai);
+    $stmt_upd = mysqli_prepare($koneksi, "UPDATE nilai SET ujian_selesai=?, jml_benar=?, jml_salah=?, skor=?, total=?, online=0, jawaban=?, jawaban_esai=? WHERE id_nilai=?");
+    mysqli_stmt_bind_param($stmt_upd, 'siiddssi', $datetime, $benar, $jml_salah, $skor, $skor, $ser_jawab, $ser_jawabesai, $idnilai);
+    mysqli_stmt_execute($stmt_upd);
+    mysqli_stmt_close($stmt_upd);
     mysqli_query($koneksi, "INSERT INTO log (id_siswa,type,text,date) VALUES ('$ids','login','Selesai Ujian','$tanggal $waktu')");
     return true;
 }

@@ -50,7 +50,7 @@ endif;
 	<link rel='stylesheet' href='<?= $homeurl ?>/plugins/sweetalert2/dist/sweetalert2.min.css'>
 	<link rel='stylesheet' href='<?= $homeurl ?>/plugins/toastr/toastr.min.css'>
 	<link rel='stylesheet' href='<?= $homeurl ?>/plugins/izitoast/css/iziToast.min.css'>
-	<link rel='stylesheet' href='<?= $homeurl ?>/dist/css/costum.css' />
+	<link rel='stylesheet' href='<?= $homeurl ?>/dist/css/costum.css?v=2' />
 	<script src='<?= $homeurl ?>/plugins/tinymce/tinymce.min.js'></script>
 	<script src='<?= $homeurl ?>/plugins/jQuery/jquery-3.1.1.min.js'></script>
 	<script src='<?= $homeurl ?>/plugins/datatables/jquery.dataTables.min.js'></script>
